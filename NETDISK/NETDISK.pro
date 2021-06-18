@@ -16,16 +16,29 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    communication.cpp \
+    download.cpp \
+    folder.cpp \
     main.cpp \
-    netdisk.cpp
+    netdisk.cpp \
+    register.cpp
 
 HEADERS += \
-    netdisk.h
+    communication.h \
+    download.h \
+    folder.h \
+    netdisk.h \
+    register.h
 
 FORMS += \
-    netdisk.ui
+    download.ui \
+    folder.ui \
+    netdisk.ui \
+    register.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES +=
