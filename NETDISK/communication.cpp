@@ -10,11 +10,13 @@ string Communication::message_to_string(netdisk_message & msg)
         re+="\t";
         re+=msg.path;
         re+="\t";
-        re+=msg.md5;
-        re+="\t";
-        if(msg.op==SEND_FILE){
-            re+=msg.content;
+        if(msg.op!=BIND_DIR&&msg.op!=RM_BIND_DIR){
+            re+=msg.md5;
             re+="\t";
+            if(msg.op==SEND_FILE){
+                re+=msg.content;
+                re+="\t";
+            }
         }
     }
 
@@ -26,7 +28,6 @@ netdisk_message Communication::string_to_message(string &msg)
     netdisk_message re;
     re.no=msg[msgno_begin];
     re.op=msg[op_begin];
-    re.is_file=msg[flagfile_begin];
     if(re.op!=SURE_GET&&re.op!=NOT_GET){
         re.is_file=msg[flagfile_begin];
         int pos=flagfile_begin+1;
@@ -39,16 +40,18 @@ netdisk_message Communication::string_to_message(string &msg)
             re.path+=msg[pos];
             pos++;
         }
-        pos++;
-        while(msg[pos!='\t']){
-            re.md5+=msg[pos];
+        if(re.op!=BIND_DIR&&re.op!=RM_BIND_DIR){
             pos++;
-        }
-        pos++;
-        if(re.op==SEND_FILE){
             while(msg[pos!='\t']){
-                re.content+=msg[pos];
+                re.md5+=msg[pos];
                 pos++;
+            }
+            pos++;
+            if(re.op==SEND_FILE){
+                while(msg[pos!='\t']){
+                    re.content+=msg[pos];
+                    pos++;
+                }
             }
         }
     }
@@ -71,13 +74,15 @@ Communication::Communication(string ip,int port)
 {
     this->ip=ip;
     this->port=port;
-    this->connection();
+    this->ConnectError=false;
+    // this->connection();
 }
 int Communication::connection(){
     sclient = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(sclient == INVALID_SOCKET)
     {
         cout<<"invalid socket!"<<endl;
+        this->ConnectError=true;
         return myERROR;
     }
     sockaddr_in serAddr;
@@ -88,7 +93,34 @@ int Communication::connection(){
     {  //连接失败
         cout<<"connect error !"<<endl;
         closesocket(sclient);
+        this->ConnectError=true;
         return myERROR;
     }
     return myOK;
+}
+
+bool Communication::connecterror(){
+    return this->ConnectError;
+}
+
+int Communication::recv_message(netdisk_message &recv_content)
+{
+    string recvstr;
+    char buf[SENDSIZE];
+    if(recv(sclient,buf,SENDSIZE,0)<=0)
+        return myERROR;
+    recvstr=string(buf);
+    recv_content=string_to_message(recvstr);
+    return myOK;
+}
+
+int Communication::disconnection(){
+    if(connecterror()==false){
+        closesocket(sclient);
+    }
+    return myOK;
+}
+
+Communication::~Communication(){
+    disconnection();
 }
