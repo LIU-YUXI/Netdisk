@@ -8,14 +8,46 @@
 #include<string.h>
 #include<direct.h>
 using namespace std;
-bool search_folder(const char para[])
+
+string findlinkFolder(string in,string path,bool &linked,int length) {
+	linked = false;
+	if (path.length() < length)
+		return "no";
+	int pos1 = 0, pos2 = 0;
+	
+	path.erase(path.length()- 4);
+	string folder = path.substr(length);
+	while (1) {
+		if (pos2 == in.length()) {
+			return "nothing";
+		}
+		if (in[pos2] == '\n') {
+			string temp = in.substr(pos1, pos2 - pos1 + 1);
+			
+			if (temp.find(folder) != -1) {
+				if (temp.find(">") != -1) {
+					linked = true;
+					return temp.substr(temp.find(">")+1);
+				}
+				else {
+					linked = false;
+					return "ababa";
+				}
+			}
+			pos1 = pos2 + 1;
+		}
+		pos2++;
+	}
+
+}
+bool search_folder(const char para[],string content,int length)
 {
 	WIN32_FIND_DATAA fdfile;
-	HANDLE hFind = FindFirstFileA(para, &fdfile);//µÚÒ»¸ö²ÎÊıÊÇÂ·¾¶Ãû£¬¿ÉÒÔÊ¹ÓÃÍ¨Åä·û£¬fd´æ´¢ÓĞÎÄ¼şµÄĞÅÏ¢
+	HANDLE hFind = FindFirstFileA(para, &fdfile);//ç¬¬ä¸€ä¸ªå‚æ•°æ˜¯è·¯å¾„åï¼Œå¯ä»¥ä½¿ç”¨é€šé…ç¬¦ï¼Œfdå­˜å‚¨æœ‰æ–‡ä»¶çš„ä¿¡æ¯
 	bool done = true, found_fondfolder = false;
 	while (1)
 	{
-		done = FindNextFileA(hFind, &fdfile); //·µ»ØµÄÖµÈç¹ûÎª0ÔòÃ»ÓĞÎÄ¼şÒªÑ°ÁË
+		done = FindNextFileA(hFind, &fdfile); //è¿”å›çš„å€¼å¦‚æœä¸º0åˆ™æ²¡æœ‰æ–‡ä»¶è¦å¯»äº†
 		if (!done)
 			break;
 		if (!strcmp(fdfile.cFileName, "..") || !strcmp(fdfile.cFileName, "."))
@@ -29,13 +61,13 @@ bool search_folder(const char para[])
 	FindClose(hFind);
 	return false;
 }
-void open_folder(const char para[], int round, int ctrl[])
+void open_folder(const char para[], int round, int ctrl[],string content,int length)
 {
 	WIN32_FIND_DATAA fdfile;
-	HANDLE hFind = FindFirstFileA(para, &fdfile);//µÚÒ»¸ö²ÎÊıÊÇÂ·¾¶Ãû£¬¿ÉÒÔÊ¹ÓÃÍ¨Åä·û£¬fd´æ´¢ÓĞÎÄ¼şµÄĞÅÏ¢
+	HANDLE hFind = FindFirstFileA(para, &fdfile);//ç¬¬ä¸€ä¸ªå‚æ•°æ˜¯è·¯å¾„åï¼Œå¯ä»¥ä½¿ç”¨é€šé…ç¬¦ï¼Œfdå­˜å‚¨æœ‰æ–‡ä»¶çš„ä¿¡æ¯
 	if (hFind == INVALID_HANDLE_VALUE)
 	{
-		cout << "ÎŞĞ§µÄÂ·¾¶ - ";
+		cout << "æ— æ•ˆçš„è·¯å¾„ - ";
 		for (int i = 2; para[i + 1] != '*'; i++)
 		{
 			if (para[i] <= 'z' && para[i] >= 'a')
@@ -43,16 +75,16 @@ void open_folder(const char para[], int round, int ctrl[])
 			else
 				cout << para[i];
 		}
-		cout << "\nÃ»ÓĞ×ÓÎÄ¼ş¼Ğ\n\n";
+		cout << "\næ²¡æœ‰å­æ–‡ä»¶å¤¹\n\n";
 		return;
 	}
-	bool done = true, found_ = search_folder(para);
+	bool done = true, found_ = search_folder(para,content,length);
 	if (!found_)
 		ctrl[round] = 0;
 	int if_is_round1 = 1;
 	while (1)
 	{
-		done = FindNextFileA(hFind, &fdfile);//·µ»ØµÄÖµÈç¹ûÎª0ÔòÃ»ÓĞÎÄ¼şÒªÑ°ÁË
+		done = FindNextFileA(hFind, &fdfile);//è¿”å›çš„å€¼å¦‚æœä¸º0åˆ™æ²¡æœ‰æ–‡ä»¶è¦å¯»äº†
 
 		if (!done && if_is_round1)
 			return;
@@ -98,7 +130,7 @@ void open_folder(const char para[], int round, int ctrl[])
 	while (1)
 	{
 		bool done = true;
-		done = FindNextFileA(hfFind, &fdfolder); //·µ»ØµÄÖµÈç¹ûÎª0ÔòÃ»ÓĞÎÄ¼şÒªÑ°
+		done = FindNextFileA(hfFind, &fdfolder); //è¿”å›çš„å€¼å¦‚æœä¸º0åˆ™æ²¡æœ‰æ–‡ä»¶è¦å¯»
 
 		if (!done)
 			break;
@@ -106,7 +138,7 @@ void open_folder(const char para[], int round, int ctrl[])
 			continue;
 		if (!strcmp(fdfolder.cFileName, ".."))
 			continue;
-		else//ÕÒµ½µÄÊÇÎÄ¼ş¼Ğ
+		else//æ‰¾åˆ°çš„æ˜¯æ–‡ä»¶å¤¹
 		{
 			for (int i = 1; i <= round - 1; i++)
 				if (ctrl[i])
@@ -145,12 +177,21 @@ void open_folder(const char para[], int round, int ctrl[])
 			ctrl[round] = 0;
 		}
 		ctrl[round + 1] = 1;
-		char adr[256] = { 0 };
+		char adr[512] = { 0 };
 		for (int i = 0; para[i] != '*'; i++)
 			adr[i] = para[i];
 		strcat(adr, filename);
-		strcat(adr, "/*.*");
-		open_folder(adr, round + 1, ctrl);
+		bool islinked;
+		strcat(adr, "\\*.*");
+		
+		string a=findlinkFolder(content, adr, islinked, length);
+		if (islinked) {
+			memset(adr, 0, 260);
+			a.erase(a.length() - 1);
+			sprintf_s(adr, 260, "%s", a.c_str());
+			strcat(adr, "\\*.*");
+		}
+		open_folder(adr, round + 1, ctrl,content,length);
 		if (!done)
 		{
 			FindClose(hfFind);
@@ -160,40 +201,22 @@ void open_folder(const char para[], int round, int ctrl[])
 	}
 }
 void openfile(string filename) {
-	//´ÓÎÄ¼şÖĞÄÃµ½Ãû×Ö£¬Èç¹ûÃ»ÓĞ¼ıÍ·±íÊ¾Ã»ÓĞ±»°ó¶¨
-	//·ñÔò±íÊ¾±»°ó¶¨£¬Ìæ»»ÎªºóÃæµÄÄÚÈİ£¬µ÷ÓÃopen_folder
+	//ä»æ–‡ä»¶ä¸­æ‹¿åˆ°åå­—ï¼Œå¦‚æœæ²¡æœ‰ç®­å¤´è¡¨ç¤ºæ²¡æœ‰è¢«ç»‘å®š
+	//å¦åˆ™è¡¨ç¤ºè¢«ç»‘å®šï¼Œæ›¿æ¢ä¸ºåé¢çš„å†…å®¹ï¼Œè°ƒç”¨open_folder
 	ifstream in;
 	in.open(filename.c_str(), ios::in);
-	while (1) {
-		char buff[1024] = { 0 };
-		in.getline(buff, 1024);
-		if (!in.good())
-			break;
-
-		string netdiskname, localname;
-		bool link = false;
-		int i = 0;
-		for (; buff[i] != '\0'; i++) {
-			if (buff[i] == '>') {
-				link = true;
-				break;
-			}
-		}
-
-		cout << buff << endl;
-		buff[i] = 0;
-		netdiskname = buff;
-		if (!link)
-			continue;
-		localname = &buff[i + 1];
-		localname.append("\\*.*");
-		int ctrl[20] = { 0,1 };
-		open_folder(localname.c_str(), 1, ctrl);
-
-	}
+	int ctrl[20] = { 0,1 };
+	string content;
+	while (in.good())
+		content.insert(content.length(),1,(char)in.get());
+	in.close();
+	cout << "Liu-root" << endl;
+	int length = strlen("C:\\Users\\fyl06\\Documents\\mycloud\\Liu\\");
+	open_folder("C:\\Users\\fyl06\\Documents\\mycloud\\Liu\\Liu-root\\*.*",1, ctrl, content,length);
 
 }
+
 int main() {
-	openfile("C:\\Users\\XYxiyang\\Documents\\mycloud\\Liu\\usrconfig.conf");
+	openfile("C:\\Users\\fyl06\\Documents\\mycloud\\Liu\\usrconfig.conf");
 	return 0;
 }
