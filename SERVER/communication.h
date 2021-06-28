@@ -1,12 +1,13 @@
-#ifndef COMMUNICATION_H
-#define COMMUNICATION_H
-
-#endif // COMMUNICATION_H
 #include <iostream>
-#include <string>
-#include <winsock2.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <ifaddrs.h>
+#include <arpa/inet.h>
 using namespace std;
-
 #define myOK 0
 #define myERROR -1
 
@@ -25,8 +26,8 @@ using namespace std;
 #define LOGIN 11
 #define LOGOUT 12
 #define REGIST 13
+#define FINISH_INITIAL 14
 #define CONFIGFILE 15 // 记录目录的配置文件内容
-
 /* 信息發送字符串的信息 */
 #define msgno_begin 0 // string中对应的位置
 #define op_begin 1
@@ -67,32 +68,35 @@ struct netdisk_message{
     }
 };
 
-// 负责联网和通信，使用 Communication(string ip,string port); 初始化，然后调用connect连接
+// 负责针对某个客户端的通信，使用 Communication(int connfd);传入连接好的句柄
 class Communication {
 private:
     bool message_count_use[MAXMESSAGE]; //标记该消息号是否用过
-    string ip;
-    int port;
+    // string ip;
+    // int port;
+    int connfd;
     bool ConnectError;
-    SOCKET sclient;
     string message_to_string(netdisk_message & msg);
     netdisk_message string_to_message(string &msg);
 public:
     // 與服務端鏈接是否錯誤
     bool connecterror();
+    // no表示指定消息序号，如果不指定则随机生成
+    // 发送配置文件
+    int send_configmessage(int op,string filename,string content,int no=-1);
     // 發送信息
-    int send_message(int op,string filename,bool is_file,string path="",string md5="",string content="");
+    int send_message(int op,string filename,bool is_file,string path="",string md5="",string content="",int no=-1);
     // 发送用户登录、登出、注册信息
-    int send_usermessage(int op,string username,string useri,string passwd);   
-    // 初始化類類型，调用完请接着调用connect函数来连接服务器
-    Communication(string ip,int port);
-    // 鏈接服務端
-    int connection();
-    // 斷開服務器鏈接
+    int send_usermessage(int op,string username,string useri,string passwd,bool user_correct,int no=-1);   
+    // 初始化類類型
+    Communication(int connfd);
+    // 斷開鏈接
     int disconnection();
     ~Communication();
     // 接受來自服務端的信息，並返回到recv_content
     int recv_message(netdisk_message &recv_content);
-    // 中途断网，尝试60s重连，成功返回ok
-    int REconnection();
+    // 状态转移函数，进行初始化的阶段性转移
+    // (注册)->登录->
+
+    
 };

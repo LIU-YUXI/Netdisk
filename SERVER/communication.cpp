@@ -84,8 +84,25 @@ netdisk_message Communication::string_to_message(string &msg)
     }
     return re;
 } 
+int Communication::send_configmessage(int op,string filename,string content){
+    int message_no=1;
+    for(int i=1;i<MAXMESSAGE;i++){
+        if(message_count_use[i]==0){
+            message_no=i;
+            break;
+        }
+    }
+    netdisk_message msg(message_no,op,filename,0,"","",content,"","","",0);
+    string sendstr=message_to_string(msg);
+    if(send(connfd,sendstr.c_str(),sendstr.length(),0)<=0){
+        cout<<"fail to send message, please check the network"<<endl;
+        return myERROR;
+    }
+    message_count_use[message_no]=1;
+    return message_no;
+}
 // 返回消息号
-int Communication::send_usermessage(int op,string username,string userid,string passwd)
+int Communication::send_usermessage(int op,string username,string userid,string passwd,bool user_correct)
 {
     int message_no=1;
     for(int i=1;i<MAXMESSAGE;i++){
@@ -94,9 +111,9 @@ int Communication::send_usermessage(int op,string username,string userid,string 
             break;
         }
     }
-    netdisk_message msg(message_no,op,"",0,"","","",username,userid,passwd,0);
+    netdisk_message msg(message_no,op,"",0,"","","",username,userid,passwd,user_correct);
     string sendstr=message_to_string(msg);
-    if(send(sclient,sendstr.c_str(),sendstr.length(),0)<=0){
+    if(send(connfd,sendstr.c_str(),sendstr.length(),0)<=0){
         cout<<"fail to send message, please check the network"<<endl;
         return myERROR;
     }
@@ -122,35 +139,12 @@ int Communication::send_message(int op,string filename,bool is_file,string path,
     message_count_use[message_no]=1;
     return message_no;
 }
-Communication::Communication(string ip,int port)
+Communication::Communication(int connfd)
 {
-    this->ip=ip;
-    this->port=port;
-    this->ConnectError=false;
+    this->connfd=connfd;
     memset(message_count_use,0,MAXMESSAGE);
-    // this->connection();
 }
-int Communication::connection(){
-    sclient = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if(sclient == INVALID_SOCKET)
-    {
-        cout<<"invalid socket!"<<endl;
-        this->ConnectError=true;
-        return myERROR;
-    }
-    sockaddr_in serAddr;
-    serAddr.sin_family = AF_INET;
-    serAddr.sin_port = htons(this->port);
-    serAddr.sin_addr.S_un.S_addr = inet_addr(this->ip.c_str());
-    if(connect(sclient, (sockaddr *)&serAddr, sizeof(serAddr)) == SOCKET_ERROR)
-    {  //连接失败
-        cout<<"connect error !"<<endl;
-        closesocket(sclient);
-        this->ConnectError=true;
-        return myERROR;
-    }
-    return myOK;
-}
+
 
 bool Communication::connecterror(){
     return this->ConnectError;
@@ -160,7 +154,7 @@ int Communication::recv_message(netdisk_message &recv_content)
 {
     string recvstr;
     char buf[SENDSIZE];
-    if(recv(sclient,buf,SENDSIZE,0)<=0)
+    if(recv(connfd,buf,SENDSIZE,0)<=0)
         return myERROR;
     recvstr=string(buf);
     recv_content=string_to_message(recvstr);
@@ -172,21 +166,13 @@ int Communication::recv_message(netdisk_message &recv_content)
 
 int Communication::disconnection(){
     if(connecterror()==false){
-        closesocket(sclient);
+        closesocket(connfd);
     }
     return myOK;
 }
+
 
 Communication::~Communication(){
     disconnection();
 }
 
-int Communication::REconnection()
-{
-    while(1){
-        if(this->connection()==myOK)
-            return myOK;
-        Sleep(100);
-    }
-    return myERROR;
-}
