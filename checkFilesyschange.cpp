@@ -5,11 +5,11 @@
 
 
 using namespace std;
-// ¿í×Ö½Ú×Ö·û´®×ª¶à×Ö½Ú×Ö·û´®
+// å®½å­—èŠ‚å­—ç¬¦ä¸²è½¬å¤šå­—èŠ‚å­—ç¬¦ä¸²
 void W2C(wchar_t* pwszSrc, int iSrcLen, char* pszDest, int iDestLen)
 {
     ::RtlZeroMemory(pszDest, iDestLen);
-    // ¿í×Ö½Ú×Ö·û´®×ª¶à×Ö½Ú×Ö·û´®
+    // å®½å­—èŠ‚å­—ç¬¦ä¸²è½¬å¤šå­—èŠ‚å­—ç¬¦ä¸²
     ::WideCharToMultiByte(CP_ACP,
         0,
         pwszSrc,
@@ -41,7 +41,7 @@ int main() {
     {
         FILE_NOTIFY_INFORMATION* pFileNotifyInfo = (FILE_NOTIFY_INFORMATION*)pBuf;
         ::RtlZeroMemory(pFileNotifyInfo, dwBufferSize);
-        // ÉèÖÃ¼à¿ØÄ¿Â¼
+        // è®¾ç½®ç›‘æŽ§ç›®å½•
         bRet = ::ReadDirectoryChangesW(dir_handle,
             pFileNotifyInfo,
             dwBufferSize,
@@ -51,7 +51,7 @@ int main() {
             FILE_NOTIFY_CHANGE_DIR_NAME | // creating, deleting a directory or sub
             FILE_NOTIFY_CHANGE_FILE_NAME|
             FILE_NOTIFY_CHANGE_CREATION,
-            //FILE_NOTIFY_CHANGE_LAST_WRITE,//Èç¹û²»¹Ø±ÕÕâÏî»áµ¼ÖÂÄ¿Â¼ÖÐµÄÎÄ¼þ¼ÐÒ²ÏÔÊ¾±»¸ü¸Ä
+            //FILE_NOTIFY_CHANGE_LAST_WRITE,//å¦‚æžœä¸å…³é—­è¿™é¡¹ä¼šå¯¼è‡´ç›®å½•ä¸­çš„æ–‡ä»¶å¤¹ä¹Ÿæ˜¾ç¤ºè¢«æ›´æ”¹
             &dwRet,
             NULL,
             NULL);
@@ -62,27 +62,27 @@ int main() {
         }
         
        
-        // ÅÐ¶Ï²Ù×÷ÀàÐÍ²¢ÏÔÊ¾
+        // åˆ¤æ–­æ“ä½œç±»åž‹å¹¶æ˜¾ç¤º
         while (1) {
-            // ½«¿í×Ö·û×ª»»³ÉÕ­×Ö·û
+            // å°†å®½å­—ç¬¦è½¬æ¢æˆçª„å­—ç¬¦
             W2C((wchar_t*)(&pFileNotifyInfo->FileName), pFileNotifyInfo->FileNameLength, szTemp, MAX_PATH);
             switch (pFileNotifyInfo->Action)
             {
             case FILE_ACTION_ADDED:
             {
-                // ÐÂÔöÎÄ¼þ
+                // æ–°å¢žæ–‡ä»¶
                 printf("[File Added Action]%s\n", szTemp);
                 break;
             }
             case FILE_ACTION_REMOVED:
             {
-                // ÐÂÔöÎÄ¼þ
+                // æ–°å¢žæ–‡ä»¶
                 printf("[File Removed Action]%s\n", szTemp);
                 break;
             }
             case FILE_ACTION_MODIFIED:
             {
-                // ÐÂÔöÎÄ¼þ
+                // æ–°å¢žæ–‡ä»¶
                 printf("[File Modified Action]%s\n", szTemp);
                 break;
             }
@@ -101,7 +101,7 @@ int main() {
                 break;
             }
             }
-            if (pFileNotifyInfo->NextEntryOffset != 0)//¶à²½²Ù×÷£¬ÒÆ¶¯Æ«ÒÆÁ¿
+            if (pFileNotifyInfo->NextEntryOffset != 0)//å¤šæ­¥æ“ä½œï¼Œç§»åŠ¨åç§»é‡
             {
                 pFileNotifyInfo = (FILE_NOTIFY_INFORMATION*)(((BYTE*)pFileNotifyInfo) + pFileNotifyInfo->NextEntryOffset);
             }
