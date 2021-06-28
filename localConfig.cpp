@@ -17,7 +17,7 @@ const string path2 = "\\Documents\\mycloud\\";
 const string path3 = "\\";
 
 int main() {
-	string clientusrname = "Liu";//µ½Ê±ºò¸ù¾İµÇÂ¼Ãû½øĞĞĞŞ¸Ä
+	string clientusrname = "Liu";//åˆ°æ—¶å€™æ ¹æ®ç™»å½•åè¿›è¡Œä¿®æ”¹
 	char winusrname[256] = { 0 };
 	DWORD dwSize = 256;
 	GetUserNameA(winusrname, &dwSize);
@@ -35,7 +35,7 @@ int main() {
 
 
 		in.close();
-	}//ÅäÖÃÎÄ¼ş´æÔÚ£¬¿ÉÒÔ¶ÁÈ¡°ó¶¨Ä¿Â¼
+	}//é…ç½®æ–‡ä»¶å­˜åœ¨ï¼Œå¯ä»¥è¯»å–ç»‘å®šç›®å½•
 	else {
 		string path;
 		path += path1;
@@ -54,5 +54,5 @@ int main() {
 
 		out.close();
 		
-	}//½øĞĞÄ¿Â¼°ó¶¨
+	}//è¿›è¡Œç›®å½•ç»‘å®š
 }
