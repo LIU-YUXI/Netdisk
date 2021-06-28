@@ -209,3 +209,4 @@ int Communication::procs_login(netdisk_message msg){
     this->configname="./"+msg.userid+"/"+"dir.cfg";
     
 }
+

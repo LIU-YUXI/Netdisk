@@ -11,7 +11,8 @@ using namespace std;
 #define myERROR -1
 
 /* 信息發送的操作符 */
-#define INITIAL 1
+#define INITIAL_CLIENT 1
+#define INITIAL_SERVER 17
 #define SEND 2 // 询问要不要发这个文件
 #define SEND_FILE 3 // 发文件（真的文件）
 #define REMOVE 4
@@ -25,8 +26,13 @@ using namespace std;
 #define LOGIN 11
 #define LOGOUT 12
 #define REGIST 13
-#define CONFIGFILE 15 // 记录目录的配置文件内容
-
+#define FINISH_INITIAL 14
+#define SENDCONFIG 15 // 发送记录目录的配置文件内容
+#define GETCONFIG 16 // 索取初始化目录结构
+/* 处理未完成的异常事件 */
+#define PROCSEXCP 18
+/* 开始同步状态 */
+#define NORMAL 19
 /* 信息發送字符串的信息 */
 #define msgno_begin 0 // string中对应的位置
 #define op_begin 1
@@ -95,4 +101,5 @@ public:
     int recv_message(netdisk_message &recv_content);
     // 中途断网，尝试60s重连，成功返回ok
     int REconnection();
+    
 };
