@@ -1,0 +1,10 @@
+debug/communication.o
+debug/download.o
+debug/folder.o
+debug/main.o
+debug/netdisk.o
+debug/register.o
+debug/moc_download.o
+debug/moc_folder.o
+debug/moc_netdisk.o
+debug/moc_register.o

@@ -2,10 +2,19 @@
 string Communication::message_to_string(netdisk_message & msg)
 {
     string re;
-    re+=(unsigned char)(msg.no);
-    re+=(unsigned char)(msg.op);
-    if(msg.op!=SURE_GET&&msg.op!=NOT_GET){
-        re+=(unsigned char)(msg.is_file);
+    re+=char(msg.no);
+    re+=char(msg.op);
+    if(msg.op==LOGIN||msg.op==LOGOUT||msg.op==REGIST){
+        re+=(char)(msg.user_correct+1);
+        re+=msg.username;
+        re+="\t";
+        re+=msg.userid;
+        re+="\t";
+        re+=msg.passwd;
+        re+='\t';
+    }
+    else if(msg.op!=SURE_GET&&msg.op!=NOT_GET){
+        re+=(char)(msg.is_file+1);
         re+=msg.filename;
         re+="\t";
         re+=msg.path;
@@ -28,8 +37,26 @@ netdisk_message Communication::string_to_message(string &msg)
     netdisk_message re;
     re.no=msg[msgno_begin];
     re.op=msg[op_begin];
-    if(re.op!=SURE_GET&&re.op!=NOT_GET){
-        re.is_file=msg[flagfile_begin];
+    if(re.op==LOGIN||re.op==LOGOUT||re.op==REGIST){
+        re.user_correct=(msg[usercorrect_begin]-1);
+        int pos=usercorrect_begin+1;
+        while(msg[pos]!='\t'){
+            re.username+=msg[pos];
+            pos++;
+        }
+        pos++;
+        while(msg[pos]!='\t'){
+            re.userid+=msg[pos];
+            pos++;
+        }
+        pos++;
+        while(msg[pos]!='\t'){
+            re.passwd+=msg[pos];
+            pos++;
+        }
+    }
+    else if(re.op!=SURE_GET&&re.op!=NOT_GET){
+        re.is_file=(msg[flagfile_begin]-1);
         int pos=flagfile_begin+1;
         while(msg[pos]!='\t'){
             re.filename+=msg[pos];
@@ -57,16 +84,29 @@ netdisk_message Communication::string_to_message(string &msg)
     }
     return re;
 } 
-
+// 返回消息号
+int Communication::send_usermessage(int op,string username,string userid,string passwd)
+{
+    message_count++;
+    netdisk_message msg(message_count,op,"",0,"","","",username,userid,passwd,0);
+    string sendstr=message_to_string(msg);
+    if(send(sclient,sendstr.c_str(),sendstr.length(),0)<=0){
+        cout<<"fail to send message, please check the network"<<endl;
+        message_count--;
+        return -1;
+    }
+    return message_count;
+}
 // 返回消息号
 int Communication::send_message(int op,string filename,bool is_file,string path,string md5,string content)
 {
     message_count++;
-    netdisk_message msg(message_count,op,filename,is_file,path,md5,content);
+    netdisk_message msg(message_count,op,filename,is_file,path,md5,content,"","","",0);
     string sendstr=message_to_string(msg);
     if(send(sclient,sendstr.c_str(),sendstr.length(),0)<=0){
         cout<<"fail to send message, please check the network"<<endl;
-        return message_count;
+        message_count--;
+        return -1;
     }
     return message_count;
 }

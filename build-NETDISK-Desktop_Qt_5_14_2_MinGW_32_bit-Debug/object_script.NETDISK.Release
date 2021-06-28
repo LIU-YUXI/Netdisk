@@ -1,0 +1,10 @@
+release/communication.o
+release/download.o
+release/folder.o
+release/main.o
+release/netdisk.o
+release/register.o
+release/moc_download.o
+release/moc_folder.o
+release/moc_netdisk.o
+release/moc_register.o

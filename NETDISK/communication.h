@@ -21,14 +21,17 @@ using namespace std;
 #define NOT_GET -1 // 不真正接收此文件
 #define BIND_DIR 8 // 綁定目錄
 #define RM_BIND_DIR 9 // 目錄解綁
-#define FINISH 0 // 完成
-
+#define FINISH 10 // 完成
+#define LOGIN 11
+#define LOGOUT 12
+#define REGIST 13
 /* 信息發送字符串的信息 */
 #define msgno_begin 0 // string中对应的位置
 #define op_begin 1
 #define flagfile_begin 2
 #define SENDFILESIZE 1024 // 每次发送的文件大小
 #define SENDSIZE 2048
+#define usercorrect_begin 3 // 判断用户账号密码是否合法，包括注册、登录时都要用到
 
 // 文件名，路径，md5码之间用\t作为分割，因为长度不定（呜呜
 // 如果是传输文件，后面还跟文件内容
@@ -40,10 +43,14 @@ struct netdisk_message{
     string path=NULL; // 路径（不包括文件名
     string filename=NULL; // 文件名
     string content=NULL; // 内容
+    string username=NULL;
+    string userid=NULL;
+    string passwd=NULL;
+    bool user_correct;
     netdisk_message(){
         ;
     }
-    netdisk_message(int no,int op,string filename,bool is_file,string path,string md5,string content){
+    netdisk_message(int no,int op,string filename,bool is_file,string path,string md5,string content,string username,string useerid,string passwd,bool user_correct){
         this->no=no;
         this->op=op;
         this->filename=filename;
@@ -51,6 +58,10 @@ struct netdisk_message{
         this->md5=md5;
         this->content=content;
         this->path=path;
+        this->username=username;
+        this->userid=userid;
+        this->passwd=passwd;
+        this->user_correct=user_correct;
     }
 };
 
@@ -69,7 +80,9 @@ public:
     bool connecterror();
     // 發送信息
     int send_message(int op,string filename,bool is_file,string path="",string md5="",string content="");
-    // 初始化類類型，並鏈接，但不一定成功
+    // 发送用户登录、登出、注册信息
+    int send_usermessage(int op,string username,string useri,string passwd);   
+    // 初始化類類型，调用完请接着调用connect函数来连接服务器
     Communication(string ip,int port);
     // 鏈接服務端
     int connection();
