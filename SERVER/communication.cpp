@@ -176,3 +176,36 @@ Communication::~Communication(){
     disconnection();
 }
 
+int Communication::state_next(int choose2){
+    if(this->STATE==REGIST)
+        this->STATE=LOGIN;
+    else if(this->STATE==LOGIN){
+        if(choose2==1){
+            this->STATE=GETCONFIG;
+        }
+        else{
+            this->STATE=SENDCONFIG;
+        }
+    }
+    else if(this->STATE==GETCONFIG||this->STATE==SENDCONFIG){
+        this->STATE=INITIAL_CLIENT;
+    }
+    else if(this->STATE==INITIAL_CLIENT){
+        this->STATE=PROCSEXCP;
+    }
+    else if(this->STATE==PROCSEXCP){
+        this->STATE=NORMAL;
+    }
+}
+
+int Communication::state_rst(){
+    this->STATE=REGIST;
+}
+
+int Communication::procs_login(netdisk_message msg){
+    if(/* 查询账号密码 */<0)
+        return myERROR;
+    this->userid=msg.userid;
+    this->configname="./"+msg.userid+"/"+"dir.cfg";
+    
+}

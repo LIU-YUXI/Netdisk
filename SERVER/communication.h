@@ -12,7 +12,8 @@ using namespace std;
 #define myERROR -1
 
 /* 信息發送的操作符 */
-#define INITIAL 1
+#define INITIAL_CLIENT 1
+#define INITIAL_SERVER 17
 #define SEND 2 // 询问要不要发这个文件
 #define SEND_FILE 3 // 发文件（真的文件）
 #define REMOVE 4
@@ -27,7 +28,12 @@ using namespace std;
 #define LOGOUT 12
 #define REGIST 13
 #define FINISH_INITIAL 14
-#define CONFIGFILE 15 // 记录目录的配置文件内容
+#define SENDCONFIG 15 // 发送记录目录的配置文件内容
+#define GETCONFIG 16 // 索取初始化目录结构
+/* 处理未完成的异常事件 */
+#define PROCSEXCP 18
+/* 开始同步状态 */
+#define NORMAL 19
 /* 信息發送字符串的信息 */
 #define msgno_begin 0 // string中对应的位置
 #define op_begin 1
@@ -71,14 +77,17 @@ struct netdisk_message{
 // 负责针对某个客户端的通信，使用 Communication(int connfd);传入连接好的句柄
 class Communication {
 private:
-    bool message_count_use[MAXMESSAGE]; //标记该消息号是否用过
-    // string ip;
-    // int port;
+    bool message_count_use[MAXMESSAGE]; // 标记该消息号是否用过
+    // 状态，用op表示
+    int STATE;
     int connfd;
     bool ConnectError;
     string message_to_string(netdisk_message & msg);
     netdisk_message string_to_message(string &msg);
 public:
+    // 用户id
+    string userid;
+    string configname;
     // 與服務端鏈接是否錯誤
     bool connecterror();
     // no表示指定消息序号，如果不指定则随机生成
@@ -96,7 +105,13 @@ public:
     // 接受來自服務端的信息，並返回到recv_content
     int recv_message(netdisk_message &recv_content);
     // 状态转移函数，进行初始化的阶段性转移
-    // (注册)->登录->
-
-    
+    // (注册)->登录->发送目录配置文件(如果没有，则客户端要求初始化一个目录结构，并发给服务端)->
+    // -> 接收客户端的逐个文件询问，没有的就让客户端上传 -> 服务端向客户端发文件->
+    // -> 遗留的未完成事件(异常表中)的处理
+    // 开始等待各种随机事件，如绑定目录，增删改
+    // 如果中途断网了，从登录开始重新走
+    int state_next(int choose2=-1);
+    int state_rst();
+    // 接收到登录消息后，确认账号密码对不对，如果对，则把用户名发给客户端，并且把id存到类的数据成员userid里
+    int procs_login(netdisk_message msg);
 };
