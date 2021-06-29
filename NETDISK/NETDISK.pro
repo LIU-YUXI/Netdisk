@@ -17,24 +17,24 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     communication.cpp \
-    download.cpp \
-    folder.cpp \
+    dialog_download.cpp \
+    dialog_folder.cpp \
+    dialog_regist.cpp \
     main.cpp \
-    netdisk.cpp \
-    register.cpp
+    netdisk.cpp
 
 HEADERS += \
     communication.h \
-    download.h \
-    folder.h \
-    netdisk.h \
-    register.h
+    dialog_download.h \
+    dialog_folder.h \
+    dialog_regist.h \
+    netdisk.h
 
 FORMS += \
-    download.ui \
-    folder.ui \
-    netdisk.ui \
-    register.ui
+    dialog_download.ui \
+    dialog_folder.ui \
+    dialog_regist.ui \
+    netdisk.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

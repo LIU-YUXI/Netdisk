@@ -84,14 +84,36 @@ netdisk_message Communication::string_to_message(string &msg)
     }
     return re;
 } 
+int Communication::send_configmessage(int op,string filename,string content,int no){
+    int message_no=no;
+    if(no==-1){
+        for(int i=1;i<MAXMESSAGE;i++){
+            if(message_count_use[i]==0){
+                message_no=i;
+                break;
+            }
+        }
+    }
+    netdisk_message msg(message_no,op,filename,0,"","",content,"","","",0);
+    string sendstr=message_to_string(msg);
+    if(send(sclient,sendstr.c_str(),sendstr.length(),0)<=0){
+        cout<<"fail to send message, please check the network"<<endl;
+        return myERROR;
+    }
+    if(no==-1)
+        message_count_use[message_no]=1;
+    return message_no;
+}
 // 返回消息号
-int Communication::send_usermessage(int op,string username,string userid,string passwd)
+int Communication::send_usermessage(int op,string username,string userid,string passwd,int no)
 {
-    int message_no=1;
-    for(int i=1;i<MAXMESSAGE;i++){
-        if(message_count_use[i]==0){
-            message_no=i;
-            break;
+    int message_no=no;
+    if(no==-1){
+        for(int i=1;i<MAXMESSAGE;i++){
+            if(message_count_use[i]==0){
+                message_no=i;
+                break;
+            }
         }
     }
     netdisk_message msg(message_no,op,"",0,"","","",username,userid,passwd,0);
@@ -100,17 +122,20 @@ int Communication::send_usermessage(int op,string username,string userid,string 
         cout<<"fail to send message, please check the network"<<endl;
         return myERROR;
     }
-    message_count_use[message_no]=1;
+    if(no==-1)
+        message_count_use[message_no]=1;
     return message_no;
 }
 // 返回消息号
-int Communication::send_message(int op,string filename,bool is_file,string path,string md5,string content)
+int Communication::send_message(int op,string filename,bool is_file,string path,string md5,string content,int no)
 {
-    int message_no=1;
-    for(int i=1;i<MAXMESSAGE;i++){
-        if(message_count_use[i]==0){
-            message_no=i;
-            break;
+    int message_no=no;
+    if(no==-1){
+        for(int i=1;i<MAXMESSAGE;i++){
+            if(message_count_use[i]==0){
+                message_no=i;
+                break;
+            }
         }
     }
     netdisk_message msg(message_no,op,filename,is_file,path,md5,content,"","","",0);
@@ -119,7 +144,8 @@ int Communication::send_message(int op,string filename,bool is_file,string path,
         cout<<"fail to send message, please check the network"<<endl;
         return myERROR;
     }
-    message_count_use[message_no]=1;
+    if(no==-1)
+        message_count_use[message_no]=1;
     return message_no;
 }
 Communication::Communication(string ip,int port)

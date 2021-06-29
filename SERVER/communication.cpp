@@ -84,12 +84,14 @@ netdisk_message Communication::string_to_message(string &msg)
     }
     return re;
 } 
-int Communication::send_configmessage(int op,string filename,string content){
-    int message_no=1;
-    for(int i=1;i<MAXMESSAGE;i++){
-        if(message_count_use[i]==0){
-            message_no=i;
-            break;
+int Communication::send_configmessage(int op,string filename,string content,int no){
+    int message_no=no;
+    if(no==-1){
+        for(int i=1;i<MAXMESSAGE;i++){
+            if(message_count_use[i]==0){
+                message_no=i;
+                break;
+            }
         }
     }
     netdisk_message msg(message_no,op,filename,0,"","",content,"","","",0);
@@ -98,17 +100,20 @@ int Communication::send_configmessage(int op,string filename,string content){
         cout<<"fail to send message, please check the network"<<endl;
         return myERROR;
     }
-    message_count_use[message_no]=1;
+    if(no==-1)
+        message_count_use[message_no]=1;
     return message_no;
 }
 // 返回消息号
-int Communication::send_usermessage(int op,string username,string userid,string passwd,bool user_correct)
+int Communication::send_usermessage(int op,string username,string userid,string passwd,bool user_correct,int no)
 {
-    int message_no=1;
-    for(int i=1;i<MAXMESSAGE;i++){
-        if(message_count_use[i]==0){
-            message_no=i;
-            break;
+    int message_no=no;
+    if(no==-1){
+        for(int i=1;i<MAXMESSAGE;i++){
+            if(message_count_use[i]==0){
+                message_no=i;
+                break;
+            }
         }
     }
     netdisk_message msg(message_no,op,"",0,"","","",username,userid,passwd,user_correct);
@@ -117,17 +122,20 @@ int Communication::send_usermessage(int op,string username,string userid,string 
         cout<<"fail to send message, please check the network"<<endl;
         return myERROR;
     }
-    message_count_use[message_no]=1;
+    if(no==-1)
+        message_count_use[message_no]=1;
     return message_no;
 }
 // 返回消息号
-int Communication::send_message(int op,string filename,bool is_file,string path,string md5,string content)
+int Communication::send_message(int op,string filename,bool is_file,string path,string md5,string content,int no)
 {
-    int message_no=1;
-    for(int i=1;i<MAXMESSAGE;i++){
-        if(message_count_use[i]==0){
-            message_no=i;
-            break;
+    int message_no=no;
+    if(no==-1){
+        for(int i=1;i<MAXMESSAGE;i++){
+            if(message_count_use[i]==0){
+                message_no=i;
+                break;
+            }
         }
     }
     netdisk_message msg(message_no,op,filename,is_file,path,md5,content,"","","",0);
@@ -136,7 +144,8 @@ int Communication::send_message(int op,string filename,bool is_file,string path,
         cout<<"fail to send message, please check the network"<<endl;
         return myERROR;
     }
-    message_count_use[message_no]=1;
+    if(no==-1)
+        message_count_use[message_no]=1;
     return message_no;
 }
 Communication::Communication(int connfd)
@@ -176,18 +185,22 @@ Communication::~Communication(){
     disconnection();
 }
 
-int Communication::state_next(int choose2){
+int Communication::state_next(netdisk_message msg){
     if(this->STATE==REGIST)
         this->STATE=LOGIN;
     else if(this->STATE==LOGIN){
-        if(choose2==1){
-            this->STATE=GETCONFIG;
+        int ret=procs_login(msg);
+        if(ret==myOK){
+            if(send_cfg()==myERROR){
+                send_configmessage(GETCONFIG,"","");
+                this->STATE=GETCONFIG;
+            }
+            else{
+                this->STATE=SENDCONFIG;
+            }
         }
-        else{
-            this->STATE=SENDCONFIG;
-        }
-    }
     else if(this->STATE==GETCONFIG||this->STATE==SENDCONFIG){
+        if()
         this->STATE=INITIAL_CLIENT;
     }
     else if(this->STATE==INITIAL_CLIENT){
@@ -203,10 +216,27 @@ int Communication::state_rst(){
 }
 
 int Communication::procs_login(netdisk_message msg){
-    if(/* 查询账号密码 */<0)
+    if(msg.op!=LOGIN)
         return myERROR;
+    if(/* 查询账号密码 获得用户名*/<0){
+        send_usermessage(LOGIN,msg.username,msg.userid,msg.passwd,false,msg.no);
+        return myERROR;
+    }
     this->userid=msg.userid;
     this->configname="./"+msg.userid+"/"+"dir.cfg";
-    
+    if(send_usermessage(FINISH,msg.username,msg.userid,msg.passwd,true,msg.no)<0)
+        return myERROR;
+    return myOK;
 }
+
+int Communication::send_cfg(){
+    string cfgcontent;
+    if(readfile(configname,cfgcontent)>=0){
+        // 发送目录配置文件
+        int msgno=send_configmessage(CONFIGFILE,configname,cfgcontent);
+    }
+    return msgno;
+}
+
+
 

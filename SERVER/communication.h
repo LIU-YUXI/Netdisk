@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <ifaddrs.h>
 #include <arpa/inet.h>
+#include <vector>
 using namespace std;
 #define myOK 0
 #define myERROR -1
@@ -77,6 +78,7 @@ struct netdisk_message{
 // 负责针对某个客户端的通信，使用 Communication(int connfd);传入连接好的句柄
 class Communication {
 private:
+    vetcor <netdisk_message> msg_doing; // 已经发送但还没有收到finish的事件
     bool message_count_use[MAXMESSAGE]; // 标记该消息号是否用过
     // 状态，用op表示
     int STATE;
@@ -110,8 +112,11 @@ public:
     // -> 遗留的未完成事件(异常表中)的处理
     // 开始等待各种随机事件，如绑定目录，增删改
     // 如果中途断网了，从登录开始重新走
-    int state_next(int choose2=-1);
+    int state_next(netdisk_message msg);
     int state_rst();
     // 接收到登录消息后，确认账号密码对不对，如果对，则把用户名发给客户端，并且把id存到类的数据成员userid里
     int procs_login(netdisk_message msg);
+    // 发配置文件
+    int send_cfg();
+    
 };
