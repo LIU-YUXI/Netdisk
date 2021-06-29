@@ -15,7 +15,9 @@ int read(const char* filename,string &content)
     return myERROR;
 }
 // 递归调用
-int userfiles(const char* rootdir,vector<file>&files){
+int userfiles(string userid,const char* rootdir,queue<file>&files,bool is_root){
+    if(!is_root&&/* 不是同步目录 */)
+        return myOK;
     DIR * dir;
     struct dirent * ptr;
     string x,dirPath;
@@ -28,9 +30,9 @@ int userfiles(const char* rootdir,vector<file>&files){
         ftmp.filename=ptr->d_name;
         ftmp.is_file=ptr->d_type==DT_DIR?false:true;
         ftmp.path = rootdir+"/"+ftmp.filename;
-        files.push_back(ftmp);
         if(ptr->d_type==DT_DIR){
-            userfiles(ftmp.path,files);
+            files.push(ftmp);
+            userfiles(userid,ftmp.path,files);
         }
         else{
             FILE *fp=NULL;
@@ -41,6 +43,7 @@ int userfiles(const char* rootdir,vector<file>&files){
                 ftmp.md5=md5res;
                 pclose(fp);
             }
+            files.push(ftmp);
         }
     }
     closedir(dir);//关闭目录指针

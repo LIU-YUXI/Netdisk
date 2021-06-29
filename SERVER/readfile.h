@@ -3,6 +3,7 @@
 #include <cassert>
 #include <string>
 #include <vector>
+#include <queue>
 #include <stdio.h>
 #include <dirent.h>
 using namespace std;
@@ -17,6 +18,6 @@ struct file{
     string path;
 };
 // 将目录下所有文件存入files
-int userfiles(const char* rootdir,vector<file>&files);
+int userfiles(string userid,const char* rootdir,queue<file>&files,bool is_root=false);
 // 如果存在该文件则往后写，如果不存在则从头写
 int writefile(const char*filename,string content);

@@ -20,7 +20,8 @@ using namespace std;
 #define RENAME 5
 #define CHANGE 6 // 修改
 #define SURE_GET 7 // 确认要收这个文件
-#define NOT_GET -1 // 不真正接收此文件
+#define NOT_GET 20 // 不真正接收此文件
+#define EXIST 21 // 初始化比对时，完全相同
 #define BIND_DIR 8 // 綁定目錄
 #define RM_BIND_DIR 9 // 目錄解綁
 #define FINISH 10 // 完成
@@ -34,6 +35,8 @@ using namespace std;
 #define PROCSEXCP 18
 /* 开始同步状态 */
 #define NORMAL 19
+/* 初始等待询问状态 */
+#define INITIAL_CONSULT 22
 /* 信息發送字符串的信息 */
 #define msgno_begin 0 // string中对应的位置
 #define op_begin 1
