@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <winsock2.h>
+#include<QDebug>
 using namespace std;
 
 #define myOK 0
@@ -49,18 +50,18 @@ struct netdisk_message{
     int op; // 操作码 1bit
     bool is_tail; // 是不是传输文件的最后一个部分
     bool is_file; // true表示是文件
-    string md5=NULL; // md5码
-    string path=NULL; // 路径（不包括文件名
-    string filename=NULL; // 文件名
-    string content=NULL; // 内容
-    string username=NULL;
-    string userid=NULL;
-    string passwd=NULL;
+    string md5; // md5码
+    string path; // 路径（不包括文件名
+    string filename; // 文件名
+    string content; // 内容
+    string username;
+    string userid;
+    string passwd;
     bool user_correct;
     netdisk_message(){
         ;
     }
-    netdisk_message(int no,int op,string filename,bool is_file,string path,string md5,string content,string username,string useerid,string passwd,bool user_correct){
+    netdisk_message(int no,int op,string filename,bool is_file,string path,string md5,string content,string username,string userid,string passwd,bool user_correct){
         this->no=no;
         this->op=op;
         this->filename=filename;

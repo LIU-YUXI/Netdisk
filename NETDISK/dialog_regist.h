@@ -15,6 +15,10 @@ public:
     explicit Dialog_regist(QWidget *parent = nullptr);
     ~Dialog_regist();
 
+private slots:
+
+    void on_finish_clicked();
+
 private:
     Ui::Dialog_regist *ui;
 };
