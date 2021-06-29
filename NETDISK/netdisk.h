@@ -15,6 +15,9 @@ public:
     netdisk(QWidget *parent = nullptr);
     ~netdisk();
 
+private slots:
+    void on_pushButton_clicked();
+
 private:
     Ui::netdisk *ui;
 };
