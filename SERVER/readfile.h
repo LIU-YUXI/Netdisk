@@ -3,8 +3,11 @@
 #include <cassert>
 #include <string>
 #include <vector>
+#include <stdio.h>
 #include <dirent.h>
 using namespace std;
+#define myOK 0
+#define myERROR -1
 // 读入一个文件
 int read(const char* filename,string &content);
 struct file{
@@ -15,3 +18,5 @@ struct file{
 };
 // 将目录下所有文件存入files
 int userfiles(const char* rootdir,vector<file>&files);
+// 如果存在该文件则往后写，如果不存在则从头写
+int writefile(const char*filename,string content);

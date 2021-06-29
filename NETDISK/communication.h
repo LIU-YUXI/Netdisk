@@ -36,16 +36,18 @@ using namespace std;
 /* 信息發送字符串的信息 */
 #define msgno_begin 0 // string中对应的位置
 #define op_begin 1
-#define flagfile_begin 2
+#define flagtail_begin 2
+#define flagfile_begin 3
 #define SENDFILESIZE 1024 // 每次发送的文件大小
 #define SENDSIZE 2048
-#define usercorrect_begin 3 // 判断用户账号密码是否合法，包括注册、登录时都要用到
+#define usercorrect_begin 2 // 判断用户账号密码是否合法，包括注册、登录时都要用到
 #define MAXMESSAGE 128
 // 文件名，路径，md5码之间用\t作为分割，因为长度不定（呜呜
 // 如果是传输文件，后面还跟文件内容
 struct netdisk_message{
-    int no; // 事件编号，用来确认是不是完成了,或者确认要不要真正传输文件
-    int op; // 操作码
+    int no; // 事件编号，用来确认是不是完成了,或者确认要不要真正传输文件,1bit
+    int op; // 操作码 1bit
+    bool is_tail; // 是不是传输文件的最后一个部分
     bool is_file; // true表示是文件
     string md5=NULL; // md5码
     string path=NULL; // 路径（不包括文件名

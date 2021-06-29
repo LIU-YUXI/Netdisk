@@ -38,16 +38,18 @@ using namespace std;
 /* 信息發送字符串的信息 */
 #define msgno_begin 0 // string中对应的位置
 #define op_begin 1
-#define flagfile_begin 2
+#define flagtail_begin 2
+#define flagfile_begin 3
 #define SENDFILESIZE 1024 // 每次发送的文件大小
 #define SENDSIZE 2048
-#define usercorrect_begin 3 // 判断用户账号密码是否合法，包括注册、登录时都要用到
+#define usercorrect_begin 2 // 判断用户账号密码是否合法，包括注册、登录时都要用到
 #define MAXMESSAGE 128
 // 文件名，路径，md5码之间用\t作为分割，因为长度不定（呜呜
 // 如果是传输文件，后面还跟文件内容
 struct netdisk_message{
     int no; // 事件编号，用来确认是不是完成了,或者确认要不要真正传输文件
     int op; // 操作码
+    bool is_tail; // 发送文件时，是不是到最尾部一段了
     bool is_file; // true表示是文件
     string md5=NULL; // md5码
     string path=NULL; // 路径（不包括文件名
@@ -60,7 +62,7 @@ struct netdisk_message{
     netdisk_message(){
         ;
     }
-    netdisk_message(int no,int op,string filename,bool is_file,string path,string md5,string content,string username,string useerid,string passwd,bool user_correct){
+    netdisk_message(int no,int op,string filename,bool is_file,bool is_tail,string path,string md5,string content,string username,string useerid,string passwd,bool user_correct){
         this->no=no;
         this->op=op;
         this->filename=filename;
@@ -78,7 +80,7 @@ struct netdisk_message{
 // 负责针对某个客户端的通信，使用 Communication(int connfd);传入连接好的句柄
 class Communication {
 private:
-    vetcor <netdisk_message> msg_doing; // 已经发送但还没有收到finish的事件
+    vector <netdisk_message> msg_doing; // 已经发送但还没有收到finish的事件
     bool message_count_use[MAXMESSAGE]; // 标记该消息号是否用过
     // 状态，用op表示
     int STATE;
@@ -118,5 +120,10 @@ public:
     int procs_login(netdisk_message msg);
     // 发配置文件
     int send_cfg();
-    
+
+    // 下列两个函数的msg包括要发送的文件的除完整内容外的所有信息
+    // 发送文件
+    int sendfile(netdisk_message msg,string &content);
+    // 接收文件，返回已经接收的字节
+    int recvfile(netdisk_message msg,string &content);
 };

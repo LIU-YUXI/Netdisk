@@ -1,13 +1,18 @@
 #include "./readfile.h"
 int read(const char* filename,string &content)
 {
-    ofstream out;
-    out.open(filename, ios::out);
-    if(!out.is_open())
-        return -1;
-    out << content;
-    out.close();
-    return 0;
+  std::ifstream in(filename, std::ios::in | std::ios::binary);
+  if (in)
+  {
+    in.seekg(0, std::ios::end);
+    contents.resize(in.tellg());
+    in.seekg(0, std::ios::beg);
+    in.read(&contents[0], contents.size());
+    in.close();
+    return myOK;
+  }
+  else
+    return myERROR;
 }
 // 递归调用
 int userfiles(const char* rootdir,vector<file>&files){
@@ -28,8 +33,33 @@ int userfiles(const char* rootdir,vector<file>&files){
             userfiles(ftmp.path,files);
         }
         else{
-            
+            FILE *fp=NULL;
+            string getmd5="md5sum "+ftmp.path;
+            if((fp=popen(getmd5,r))!=NULL){
+                char md5res[33];
+                fgets(md5res,sizeof(md5res),fp);
+                ftmp.md5=md5res;
+                pclose(fp);
+            }
         }
     }
     closedir(dir);//关闭目录指针
+}
+int writefile(const char*filename,string content){
+	FILE* fp = NULL; // 文件指针
+	errno_t eResult;
+ 
+	// 以附加方式打开可读/写的文件, 如果没有此文件则会进行创建，然后以附加方式打开可读/写的文件
+	eResult = fopen_s(&fp, filename, "a+");
+ 
+	// 打开文件失败
+	if (eResult != 0)
+		return myERROR;
+ 
+	// 将追加内容写入文件指针当前的位置
+	fputs(content.c_str(), fp);
+ 
+	// 最后不要忘了,关闭打开的文件~~~
+	fclose(fp);
+	return 0;
 }
