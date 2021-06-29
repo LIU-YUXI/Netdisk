@@ -3,7 +3,10 @@ QT       += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
-LIBS += -lpthread libwsock32 libws2_32
+LIBS += \
+    -lpthread libwsock32 libws2_32 \
+    -limagehlp \
+    -lAdvapi32
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -21,14 +24,16 @@ SOURCES += \
     dialog_folder.cpp \
     dialog_regist.cpp \
     main.cpp \
-    netdisk.cpp
+    netdisk.cpp \
+    fileactions.cpp
 
 HEADERS += \
     communication.h \
     dialog_download.h \
     dialog_folder.h \
     dialog_regist.h \
-    netdisk.h
+    netdisk.h \
+    fileactions.h
 
 FORMS += \
     dialog_download.ui \

@@ -2,12 +2,15 @@
 <ui version="4.0">
  <class>Dialog_folder</class>
  <widget class="QDialog" name="Dialog_folder">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>600</height>
+    <height>758</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +19,9 @@
   <widget class="QPushButton" name="logout">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>200</y>
-     <width>93</width>
+     <width>121</width>
      <height>28</height>
     </rect>
    </property>
@@ -47,9 +50,9 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="pushButton_3">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>300</y>
-     <width>93</width>
+     <width>121</width>
      <height>28</height>
     </rect>
    </property>
@@ -61,9 +64,9 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>160</y>
-     <width>41</width>
-     <height>16</height>
+     <y>145</y>
+     <width>71</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
@@ -73,14 +76,114 @@ p, li { white-space: pre-wrap; }
   <widget class="QPushButton" name="myfile">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>250</y>
-     <width>93</width>
+     <width>121</width>
      <height>28</height>
     </rect>
    </property>
    <property name="text">
     <string>我的文件</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="link">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>580</y>
+     <width>111</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>绑定目录</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="unlink">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>580</y>
+     <width>111</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>解绑目录</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="addpath">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>580</y>
+     <width>141</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>增加云目录</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="deletepath">
+   <property name="geometry">
+    <rect>
+     <x>650</x>
+     <y>580</y>
+     <width>131</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>删除云目录</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="confirm">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>670</x>
+     <y>660</y>
+     <width>111</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>确定</string>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="cloudpath">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>650</y>
+     <width>461</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="plainText">
+    <string>cloudpath</string>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="localpath">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>710</y>
+     <width>461</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="plainText">
+    <string>localpath</string>
    </property>
   </widget>
  </widget>
