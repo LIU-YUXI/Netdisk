@@ -176,7 +176,7 @@ int Communication::recv_message(netdisk_message &recv_content)
         return myERROR;
     recvstr=string(buf);
     recv_content=string_to_message(recvstr);
-    if(recv_content.op==FINISH){// 如果通信结束，把消息号释放
+    if(recv_content.op==FINISH||recv_content.op==EXIST){// 如果通信结束，把消息号释放
         message_count_use[recv_content.no]=0;
         for(int i=0;i<msg_doing.size();i++){
             if(msg_doing[i].no==recv_content.no){
@@ -231,24 +231,54 @@ int Communication::state_next(netdisk_message msg){
     else if(this->STATE==INITIAL_CLIENT){
         if(msg.op==FINISH_INITIAL){
             this->STATE=INITIAL_SERVER;
+            // 开始遍历云端文件
+            userfiles(this->userid,this->rootpath,this->initialfiles,true);
+            if(!this->initialfiles.empty()){
+                file temp=this->initialfiles.front();
+                // 询问是否要发
+                send_message(INITIAL_SERVER,temp,temp.is_file,temp.path,temp.md5,"");
+            }
         }
         else{
             if(msg.op==INITIAL_CLIENT){
-                if(/* 检查文件是否存在 */==0){
+                int re=/* 检查文件是否存在 */;
+                if(re==0||re==2){
+                    string filename=(re==0?msg.filename:msg.filename+"-crash"); // 冲突
                     if(/* 检查文件池里有没有这个文件 */==0){
                         send_message(SURE_GET,msg.filename,msg.is_file,msg.is_tail,msg.md5,msg.content,msg.no);
-                        // 分裂线程等待
+                        // 分裂线程开始接收
+                        recvfile(msg);
                     }
+                    else{
+                        send_message(NOT_GET,msg.filename,msg.is_file,msg.is_tail,msg.md5,msg.content,msg.no);
+                    }
+                }
+                // 存在且相同
+                else if(re==1){
+                    send_message(EXIST,msg.filename,0,"","","",msg.no);
                 }
             }
         }
     }
     else if(this->STATE==INITIAL_SERVER){
+        // 这里的终止是靠我遍历结束以后自己调用一下state_next
         if(msg.op==FINISH_INITIAL){
             this->STATE=PROCSEXCP;
         }
+        // 遍历云端的所有同步文件夹
+        // 先接收上一次的结果，再发送下一次的
         else{
-            
+            if(!this->initialfiles.empty()){
+                file temp=this->initialfiles.front();
+                if(msg.op==SURE_GET){
+                    string content;
+                    read()
+                    sendfile(msg,)
+                }
+                // 询问是否要发
+                send_message(INITIAL_SERVER,temp,temp.is_file,temp.path,temp.md5,"");
+
+            }
         }
     }
     else if(this->STATE==PROCSEXCP){
@@ -283,5 +313,11 @@ int Communication::send_cfg(){
     return msgno;
 }
 
+// 发送文件
+int sendfile(netdisk_message msg,string &content){
+    
+}
+// 接收文件，返回已经接收的字节
+int recvfile(netdisk_message msg){
 
-
+}
