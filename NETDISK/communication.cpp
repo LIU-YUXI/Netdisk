@@ -69,13 +69,13 @@ netdisk_message Communication::string_to_message(string &msg)
         }
         if(re.op!=BIND_DIR&&re.op!=RM_BIND_DIR){
             pos++;
-            while(msg[pos!='\t']){
+            while(msg[pos]!='\t'){
                 re.md5+=msg[pos];
                 pos++;
             }
             pos++;
             if(re.op==SEND_FILE){
-                while(msg[pos!='\t']){
+                while(msg[pos]!='\t'){
                     re.content+=msg[pos];
                     pos++;
                 }

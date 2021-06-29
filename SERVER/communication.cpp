@@ -1,3 +1,4 @@
+#include "./readfile.h"
 #include "./communication.h"
 string Communication::message_to_string(netdisk_message & msg)
 {
@@ -14,6 +15,7 @@ string Communication::message_to_string(netdisk_message & msg)
         re+='\t';
     }
     else if(msg.op!=SURE_GET&&msg.op!=NOT_GET){
+        re+=(char)(msg.is_tail+1);
         re+=(char)(msg.is_file+1);
         re+=msg.filename;
         re+="\t";
@@ -56,6 +58,7 @@ netdisk_message Communication::string_to_message(string &msg)
         }
     }
     else if(re.op!=SURE_GET&&re.op!=NOT_GET){
+        re.is_tail=(msg[flagtail_begin]-1);
         re.is_file=(msg[flagfile_begin]-1);
         int pos=flagfile_begin+1;
         while(msg[pos]!='\t'){
@@ -69,13 +72,13 @@ netdisk_message Communication::string_to_message(string &msg)
         }
         if(re.op!=BIND_DIR&&re.op!=RM_BIND_DIR){
             pos++;
-            while(msg[pos!='\t']){
+            while(msg[pos]!='\t'){
                 re.md5+=msg[pos];
                 pos++;
             }
             pos++;
             if(re.op==SEND_FILE){
-                while(msg[pos!='\t']){
+                while(msg[pos]!='\t'){
                     re.content+=msg[pos];
                     pos++;
                 }
@@ -94,14 +97,16 @@ int Communication::send_configmessage(int op,string filename,string content,int 
             }
         }
     }
-    netdisk_message msg(message_no,op,filename,0,"","",content,"","","",0);
+    netdisk_message msg(message_no,op,filename,0,,"","",content,"","","",0);
     string sendstr=message_to_string(msg);
     if(send(connfd,sendstr.c_str(),sendstr.length(),0)<=0){
         cout<<"fail to send message, please check the network"<<endl;
         return myERROR;
     }
-    if(no==-1)
+    if(no==-1){
         message_count_use[message_no]=1;
+        msg_doing.push_back(msg);
+    }
     return message_no;
 }
 // 返回消息号
@@ -122,12 +127,14 @@ int Communication::send_usermessage(int op,string username,string userid,string 
         cout<<"fail to send message, please check the network"<<endl;
         return myERROR;
     }
-    if(no==-1)
+    if(no==-1){
         message_count_use[message_no]=1;
+        msg_doing.push_back(msg);
+    }
     return message_no;
 }
 // 返回消息号
-int Communication::send_message(int op,string filename,bool is_file,string path,string md5,string content,int no)
+int Communication::send_message(int op,string filename,bool is_file,string path,string md5,string content,int no,bool is_tail)
 {
     int message_no=no;
     if(no==-1){
@@ -144,8 +151,10 @@ int Communication::send_message(int op,string filename,bool is_file,string path,
         cout<<"fail to send message, please check the network"<<endl;
         return myERROR;
     }
-    if(no==-1)
+    if(no==-1){
         message_count_use[message_no]=1;
+        msg_doing.push_back(msg);
+    }
     return message_no;
 }
 Communication::Communication(int connfd)
@@ -169,6 +178,12 @@ int Communication::recv_message(netdisk_message &recv_content)
     recv_content=string_to_message(recvstr);
     if(recv_content.op==FINISH){// 如果通信结束，把消息号释放
         message_count_use[recv_content.no]=0;
+        for(int i=0;i<msg_doing.size();i++){
+            if(msg_doing[i].no==recv_content.no){
+                msg_doing.erase(vector<netdisk_message>::iterator(msg_doing.begin() + i));
+                break;
+            }
+        }
     }
     return myOK;
 }
@@ -199,12 +214,42 @@ int Communication::state_next(netdisk_message msg){
                 this->STATE=SENDCONFIG;
             }
         }
-    else if(this->STATE==GETCONFIG||this->STATE==SENDCONFIG){
-        if()
+    }
+    else if(this->STATE==GETCONFIG){
+        if(msg.op==SENDCONFIG){// 收到客户端发来的初始化
+            writefile(this->configname,msg.content);
+            this->STATE=INITIAL_CLIENT;
+            send_message(FINISH,msg.filename,0,"","","",msg.no);
+        }
+    }
+    else if(this->STATE==SENDCONFIG){
         this->STATE=INITIAL_CLIENT;
+        if(msg.op==FINISH){
+            this->STATE=INITIAL_CLIENT;
+        }
     }
     else if(this->STATE==INITIAL_CLIENT){
-        this->STATE=PROCSEXCP;
+        if(msg.op==FINISH_INITIAL){
+            this->STATE=INITIAL_SERVER;
+        }
+        else{
+            if(msg.op==INITIAL_CLIENT){
+                if(/* 检查文件是否存在 */==0){
+                    if(/* 检查文件池里有没有这个文件 */==0){
+                        send_message(SURE_GET,msg.filename,msg.is_file,msg.is_tail,msg.md5,msg.content,msg.no);
+                        // 分裂线程等待
+                    }
+                }
+            }
+        }
+    }
+    else if(this->STATE==INITIAL_SERVER){
+        if(msg.op==FINISH_INITIAL){
+            this->STATE=PROCSEXCP;
+        }
+        else{
+            
+        }
     }
     else if(this->STATE==PROCSEXCP){
         this->STATE=NORMAL;
