@@ -130,7 +130,7 @@ int Communication::send_configmessage(int op, string filename, string content, i
     }
     return message_no;
 }
-// 杩斿洖娑堟伅鍙�
+// 返回消息号
 int Communication::send_usermessage(int op, string username, string userid, string passwd, bool user_correct, int no)
 {
     int message_no = no;
@@ -159,7 +159,7 @@ int Communication::send_usermessage(int op, string username, string userid, stri
     }
     return message_no;
 }
-// 杩斿洖娑堟伅鍙�
+// 返回消息号
 int Communication::send_message(int op, string filename, bool is_file, string path, string md5, string content, int no, bool is_tail)
 {
     int message_no = no;
@@ -207,8 +207,8 @@ int Communication::recv_message(netdisk_message &recv_content)
         return myERROR;
     recvstr = string(buf);
     recv_content = string_to_message(recvstr);
-    if (recv_content.op == FINISH)
-    { // 濡傛灉閫氫俊缁撴潫锛屾妸娑堟伅鍙烽噴鏀�
+    if (recv_content.op == FINISH || recv_content.op == EXIST)
+    { // 如果通信结束，把消息号释放
         message_count_use[recv_content.no] = 0;
         for (int i = 0; i < msg_doing.size(); i++)
         {
@@ -259,7 +259,7 @@ int Communication::state_next(netdisk_message msg)
     else if (this->STATE == GETCONFIG)
     {
         if (msg.op == SENDCONFIG)
-        { // 鏀跺埌瀹㈡埛绔彂鏉ョ殑鍒濆鍖�
+        { // 收到客户端发来的初始化
             writefile(this->configname, msg.content);
             this->STATE = INITIAL_CLIENT;
             send_message(FINISH, msg.filename, 0, "", "", "", msg.no);
@@ -278,30 +278,65 @@ int Communication::state_next(netdisk_message msg)
         if (msg.op == FINISH_INITIAL)
         {
             this->STATE = INITIAL_SERVER;
+            // 开始遍历云端文件
+            userfiles(this->userid, this->rootpath, this->initialfiles, true);
+            if (!this->initialfiles.empty())
+            {
+                file temp = this->initialfiles.front();
+                // 询问是否要发
+                send_message(INITIAL_SERVER, temp, temp.is_file, temp.path, temp.md5, "");
+            }
         }
         else
         {
             if (msg.op == INITIAL_CLIENT)
             {
-                if (/* 妫€鏌ユ枃浠舵槸鍚﹀瓨鍦� */ == 0)
+                int re = /* 检查文件是否存在 */;
+                if (re == 0 || re == 2)
                 {
-                    if (/* 妫€鏌ユ枃浠舵睜閲屾湁娌℃湁杩欎釜鏂囦欢 */ == 0)
+                    string filename = (re == 0 ? msg.filename : msg.filename + "-crash"); // 冲突
+                    if (/* 检查文件池里有没有这个文件 */ == 0)
                     {
                         send_message(SURE_GET, msg.filename, msg.is_file, msg.is_tail, msg.md5, msg.content, msg.no);
-                        // 鍒嗚绾跨▼绛夊緟
+                        // 分裂线程开始接收
+                        recvfile(msg);
                     }
+                    else
+                    {
+                        send_message(NOT_GET, msg.filename, msg.is_file, msg.is_tail, msg.md5, msg.content, msg.no);
+                    }
+                }
+                // 存在且相同
+                else if (re == 1)
+                {
+                    send_message(EXIST, msg.filename, 0, "", "", "", msg.no);
                 }
             }
         }
     }
     else if (this->STATE == INITIAL_SERVER)
     {
+        // 这里的终止是靠我遍历结束以后自己调用一下state_next
         if (msg.op == FINISH_INITIAL)
         {
             this->STATE = PROCSEXCP;
         }
+        // 遍历云端的所有同步文件夹
+        // 先接收上一次的结果，再发送下一次的
         else
         {
+            if (!this->initialfiles.empty())
+            {
+                file temp = this->initialfiles.front();
+                if (msg.op == SURE_GET)
+                {
+                    string content;
+                    read()
+                        sendfile(msg, )
+                }
+                // 询问是否要发
+                send_message(INITIAL_SERVER, temp, temp.is_file, temp.path, temp.md5, "");
+            }
         }
     }
     else if (this->STATE == PROCSEXCP)
@@ -319,7 +354,7 @@ int Communication::procs_login(netdisk_message msg)
 {
     if (msg.op != LOGIN)
         return myERROR;
-    if (/* 鏌ヨ璐﹀彿瀵嗙爜 鑾峰緱鐢ㄦ埛鍚�*/ < 0)
+    if (/* 查询账号密码 获得用户名*/ < 0)
     {
         send_usermessage(LOGIN, msg.username, msg.userid, msg.passwd, false, msg.no);
         return myERROR;
@@ -336,8 +371,17 @@ int Communication::send_cfg()
     string cfgcontent;
     if (readfile(configname, cfgcontent) >= 0)
     {
-        // 鍙戦€佺洰褰曢厤缃枃浠�
+        // 发送目录配置文件
         int msgno = send_configmessage(CONFIGFILE, configname, cfgcontent);
     }
     return msgno;
+}
+
+// 发送文件
+int sendfile(netdisk_message msg, string &content)
+{
+}
+// 接收文件，返回已经接收的字节
+int recvfile(netdisk_message msg)
+{
 }

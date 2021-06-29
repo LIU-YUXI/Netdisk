@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <winsock2.h>
+#include<QDebug>
 using namespace std;
 
 #define myOK 0
@@ -19,7 +20,8 @@ using namespace std;
 #define RENAME 5
 #define CHANGE 6 // 修改
 #define SURE_GET 7 // 确认要收这个文件
-#define NOT_GET -1 // 不真正接收此文件
+#define NOT_GET 20 // 不真正接收此文件
+#define EXIST 21 // 初始化比对时，完全相同
 #define BIND_DIR 8 // 綁定目錄
 #define RM_BIND_DIR 9 // 目錄解綁
 #define FINISH 10 // 完成
@@ -33,6 +35,8 @@ using namespace std;
 #define PROCSEXCP 18
 /* 开始同步状态 */
 #define NORMAL 19
+/* 初始等待询问状态 */
+#define INITIAL_CONSULT 22
 /* 信息發送字符串的信息 */
 #define msgno_begin 0 // string中对应的位置
 #define op_begin 1
@@ -49,18 +53,18 @@ struct netdisk_message{
     int op; // 操作码 1bit
     bool is_tail; // 是不是传输文件的最后一个部分
     bool is_file; // true表示是文件
-    string md5=NULL; // md5码
-    string path=NULL; // 路径（不包括文件名
-    string filename=NULL; // 文件名
-    string content=NULL; // 内容
-    string username=NULL;
-    string userid=NULL;
-    string passwd=NULL;
+    string md5; // md5码
+    string path; // 路径（不包括文件名
+    string filename; // 文件名
+    string content; // 内容
+    string username;
+    string userid;
+    string passwd;
     bool user_correct;
     netdisk_message(){
         ;
     }
-    netdisk_message(int no,int op,string filename,bool is_file,string path,string md5,string content,string username,string useerid,string passwd,bool user_correct){
+    netdisk_message(int no,int op,string filename,bool is_file,string path,string md5,string content,string username,string userid,string passwd,bool user_correct){
         this->no=no;
         this->op=op;
         this->filename=filename;
