@@ -83,3 +83,5 @@ void Dialog_folder::on_confirm_clicked()
 
     ui->confirm->setDisabled(true);
 }
+
+

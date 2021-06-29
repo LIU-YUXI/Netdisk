@@ -2,6 +2,10 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include"fileactions.h"
 #include<QDebug>
+#include<QDateTime>
+#include<QTime>
+#include<QCoreApplication>
+#define logfile "C:\\mycloud\\Liu\\run.log"
 // 宽字节字符串转多字节字符串
 using namespace std;
 
@@ -19,6 +23,20 @@ string GbkToUtf8(const char *src_str)
     if (wstr) delete[] wstr;
     if (str) delete[] str;
     return strTemp;
+}
+
+void writeLog(string file,string operation,string status,string content){
+    fstream out;
+    out.open(file.c_str(),ios::out|ios::app);
+    QDateTime current_date_time =QDateTime::currentDateTime();
+    QString current_date =current_date_time.toString("yyyy.MM.dd hh:mm:ss.zzz ddd");
+    out<<"["<<current_date.toStdString()<<"]"<<endl;
+    out<<"operation:"<<operation<<endl;
+    out<<"status:"<<status<<endl;
+    out<<content<<endl<<endl;
+
+    out.close();
+
 }
 
 void W2C(wchar_t* pwszSrc, int iSrcLen, char* pszDest, int iDestLen)
@@ -133,9 +151,27 @@ void checkFileschange(const char* dir) {
 void openMonitorThread(string dir) {
     std::thread test1(checkFileschange, dir.c_str());
     test1.detach();
+    writeLog(logfile,"Add monitor thread","success","Start to monitor "+dir);
     Sleep(10);
 }
+void startMonitor(string file) {
+    fstream in;
+    in.open(file.c_str(), ios::in);
+    while (1) {
+        char buff[1024] = { 0 };
+        in.getline(buff, 1024);
+        if (!in.good())
+            break;
+        string line = buff;
+        cout << line << endl;
+        if (line.find(">") != line.npos) {
+            cout << line.substr(line.find(">") + 1) << endl;
+            openMonitorThread(line.substr(line.find(">") + 1));
+        }
+    }
 
+    in.close();
+}
 string findlinkFolder(string in,string path,bool &linked,int length) {
     linked = false;
     if ((int)path.length() < length)
@@ -365,7 +401,8 @@ bool addDir(string filename,string dirname,string clientusrname) {
             break;
         string child = buff;
         if (child.find(dirname, 0) != child.npos){
-            cout << "path already exist" << endl;
+            writeLog(logfile,"Add cloud path","fail","Cloud path already exist");
+            //cout << "path already exist" << endl;
             return false;
         }
     }
@@ -379,6 +416,7 @@ bool addDir(string filename,string dirname,string clientusrname) {
     path.append("\\");
     MakeSureDirectoryPathExists(path.c_str());
     out.close();
+    writeLog(logfile,"Add cloud path","success","Successfully added a cloud path");
     return true;
 }
 bool bondDir(string filename,string dir1,string dir2) {
@@ -386,7 +424,8 @@ bool bondDir(string filename,string dir1,string dir2) {
     WIN32_FIND_DATAA fdfile;
     HANDLE hFind = FindFirstFileA((dir2+"\\*.*").c_str(), &fdfile);
     if (hFind == INVALID_HANDLE_VALUE) {
-        cout << "file doesn't exist" << endl;
+        writeLog(logfile,"Bond cloud path","fail","local folder doesn't exist");
+        //cout << "file doesn't exist" << endl;
         return false;//目的路径不存在
     }
     int level = 0;
@@ -419,7 +458,8 @@ bool bondDir(string filename,string dir1,string dir2) {
         //cout << child << endl;
         //cout << cur_level << ' ' << level << endl;
         if (child.find(dir1, 0) != child.npos && bonded == true && cur_level>level) {//子文件夹被绑定了
-            cout << "child path have been boned" << endl;
+            writeLog(logfile,"Bond cloud path","fail","A child path have been boned");
+            //cout << "child path have been boned" << endl;
             return false;
         }
         if (dir1.find(child.substr(0,i), 0) != dir1.npos && bonded == true && cur_level < level) {//子文件夹被绑定了
@@ -432,7 +472,8 @@ bool bondDir(string filename,string dir1,string dir2) {
     }
     file.close();
     if (!found) {
-        cout << "netdisk folder dosen't exist" << endl;
+        writeLog(logfile,"Bond cloud path","fail","netdisk folder "+dir1+" dosen't exist");
+        //cout << "netdisk folder dosen't exist" << endl;
         return false;
     }
     file.open(filename.c_str(), ios::in | ios::out);
@@ -466,6 +507,7 @@ bool bondDir(string filename,string dir1,string dir2) {
     //cout <<  content << endl;
     file << content;
     file.close();
+    writeLog(logfile,"Bond cloud path","success","Successfully bond "+dir2+" to "+dir1);
     return true;
 }
 bool deleteDir(string filename, string dirname,string clientusrname) {//可以优化 是否删除目录下的全部文件
@@ -496,7 +538,8 @@ bool deleteDir(string filename, string dirname,string clientusrname) {//可以�
         //cout << child << endl;
         //cout << cur_level << ' ' << level << endl;
         if (child.find(dirname, 0) != child.npos&&cur_level>level) {
-            cout << "other folders in this folder" << endl;
+            writeLog(logfile,"Delete cloud path","fail","Other folders in this folder");
+            //cout << "other folders in this folder" << endl;
             return false;
         }
         if (child.find(dirname, 0) != child.npos && cur_level == level) {
@@ -508,7 +551,8 @@ bool deleteDir(string filename, string dirname,string clientusrname) {//可以�
         content.append("\n");
     }
     if (!found) {
-        cout << "netdisk folder dosen't exist" << endl;
+        writeLog(logfile,"Delete cloud path","fail",dirname+" dosen't exist");
+        //cout << "netdisk folder dosen't exist" << endl;
         return false;
     }
     string path;
@@ -522,6 +566,7 @@ bool deleteDir(string filename, string dirname,string clientusrname) {//可以�
     out.open(filename.c_str(), ios::out | ios::trunc);
     out << content;
     out.close();
+    writeLog(logfile,"Delete cloud path","success","Successfully deleted a cloud path");
     return true;
 }
 bool unbondDir(string filename, string dirname) {
@@ -554,7 +599,8 @@ bool unbondDir(string filename, string dirname) {
         //cout << cur_level << ' ' << level << endl;
         if (child.find(dirname, 0) != child.npos && cur_level == level) {
             if (buff[i] != '>') {
-                cout << "this folder isn't bonded" << endl;
+                writeLog(logfile,"Unbond cloud path","fail",dirname+"isn't bonded");
+                //cout << "this folder isn't bonded" << endl;
                 return false;
             }
             found = true;
@@ -566,13 +612,15 @@ bool unbondDir(string filename, string dirname) {
         content.append("\n");
     }
     if (!found) {
-        cout << "netdisk folder dosen't exist" << endl;
+        writeLog(logfile,"Unbond cloud path","fail",dirname+"doesn't exist");
+        //cout << "netdisk folder dosen't exist" << endl;
         return false;
     }
     out.close();
     out.open(filename.c_str(), ios::out | ios::trunc);
     out << content;
     out.close();
+    writeLog(logfile,"Unbond cloud path","success","Successfully unbonded a cloud path");
     return true;
 }
 void createFoldersbyFile(string filename,string dir) {
@@ -594,6 +642,7 @@ void createFoldersbyFile(string filename,string dir) {
         buff[i] = '\0';
         MakeSureDirectoryPathExists((path+buff+"\\").c_str());
     }
+    writeLog(logfile,"Create folders","success","Successfully created folders");
     file.close();
 }
 void makesureConfigexist() {
@@ -642,5 +691,11 @@ void makesureConfigexist() {
     return ;
 }
 
-
+void mysleep(int period){
+    QTime t;
+    t.start();
+    while(t.elapsed()<period*100){
+        QCoreApplication::processEvents();
+    }
+}
 

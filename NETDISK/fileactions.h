@@ -23,7 +23,7 @@ const string file2 = "\\usrconfig.conf";
 const string path1 = "C:\\mycloud\\";
 const string path2 = "\\";
 
-void openMonitorThread(string dir);
+void startMonitor(string file);
 string openFile(string filename,int length);
 void makesureConfigexist();
 void createFoldersbyFile(string filename,string dir);
@@ -31,3 +31,5 @@ bool addDir(string filename,string dirname,string clientusrname);
 bool bondDir(string filename,string dir1,string dir2);
 bool deleteDir(string filename, string dirname,string clientusrname);
 bool unbondDir(string filename, string dirname);
+void writeLog(string file,string operation,string status,string content);
+void mysleep(int period);

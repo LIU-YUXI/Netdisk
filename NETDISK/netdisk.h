@@ -20,6 +20,10 @@ private slots:
 
     void on_pushButton_2_clicked();
 
+    void on_login_clicked();
+
+    void on_regist_clicked();
+
 private:
     Ui::netdisk *ui;
 };

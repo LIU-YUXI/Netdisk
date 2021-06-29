@@ -32,7 +32,7 @@
     <string>账号</string>
    </property>
   </widget>
-  <widget class="QTextEdit" name="textEdit">
+  <widget class="QTextEdit" name="account">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -42,7 +42,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QTextEdit" name="textEdit_4">
+  <widget class="QTextEdit" name="username">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -52,7 +52,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QTextEdit" name="textEdit_2">
+  <widget class="QTextEdit" name="password1">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -62,7 +62,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QTextEdit" name="textEdit_3">
+  <widget class="QTextEdit" name="password2">
    <property name="geometry">
     <rect>
      <x>300</x>
@@ -148,7 +148,7 @@
     <string>确认密码</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="finish">
    <property name="geometry">
     <rect>
      <x>340</x>
@@ -165,6 +165,28 @@
    </property>
    <property name="text">
     <string>Finish</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="msg">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>550</y>
+     <width>431</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
  </widget>
