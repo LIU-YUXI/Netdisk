@@ -70,7 +70,7 @@ string Communication::message_to_string(netdisk_message &msg)
         {
             re += msg.md5;
             re += "\t";
-            if (msg.op == SEND_FILE || msg.op == SENDCONFIG) // || msg.op == INITIAL_CLIENT || msg.op == INITIAL_SERVER)
+            if (msg.op == SEND_FILE || msg.op == SENDCONFIG || msg.op == INITIAL_CLIENT || msg.op == INITIAL_SERVER)
             {
                 re += msg.content;
                 re += "\t";
@@ -133,7 +133,7 @@ netdisk_message Communication::string_to_message(string &msg)
                 pos++;
             }
             pos++;
-            if (re.op == SEND_FILE || re.op == SENDCONFIG) // || re.op == INITIAL_CLIENT || re.op == INITIAL_SERVER)
+            if (re.op == SEND_FILE || re.op == SENDCONFIG || re.op == INITIAL_CLIENT || re.op == INITIAL_SERVER)
             {
                 while (msg[pos] != '\t')
                 {
