@@ -29,31 +29,25 @@ void netdisk::on_login_clicked()
     com.send_usermessage(LOGIN,ui->username->toPlainText().toStdString(),
                                    ui->username->toPlainText().toStdString(),
                                    ui->password->toPlainText().toStdString());
-    netdisk_message msg;
+    qDebug()<<msg.user_correct<<endl;
     com.recv_message(msg);
-    boolean temp=msg.user_correct;
-    qDebug()<<temp<<endl;
-    if(temp==false){
+    if(msg.user_correct==false){
         ui->show->setText("密码或账号错误");
         qDebug()<<msg.user_correct<<"wrong"<<endl;
         return;
     }
     else
         ui->show->clear();
-
+    qDebug()<<"ok"<<endl;
     logfile=file1+clientname+"\\"+"run.log";
     clientname=ui->username->toPlainText().toStdString();
     com.recv_message(msg);
-    qDebug()<<"debug1"<<endl;
     if(msg.op==SENDCONFIG){
-        qDebug()<<"receive"<<endl;
         ofstream out;
         downloading_file="usrconfig.conf";
         out.open("C:\\mycloud\\"+clientname+"\\usrconfig.conf",ios::out);
         while(1){
             //com.recv_message(msg);
-            qDebug()<<msg.content.c_str()<<endl;
-            qDebug()<<"msghere"<<endl;
             out<<msg.content;
             if(msg.is_tail==true){
                 com.send_message(FINISH,"",false,"","","");
@@ -64,8 +58,6 @@ void netdisk::on_login_clicked()
         downloading_file.clear();
     }
     else{
-        qDebug()<<"send"<<endl;
-        Sleep(100000);
         string filename="C:\\mycloud\\"+clientname+"\\usrconfig.conf";
         string md5code=makesureConfigexist();
         string file;
@@ -77,7 +69,6 @@ void netdisk::on_login_clicked()
         {
             if(!fin.get(temp_ch)){
                 com.send_message(SENDCONFIG,filename,true,"",md5code,file,-1,true);
-                qDebug()<<file.c_str()<<endl;
 
                 file.clear();
                 com.recv_message(msg);
@@ -86,12 +77,6 @@ void netdisk::on_login_clicked()
                     break;
                 }
                 else{
-                    qDebug()<<"error"<<endl;
-                    Sleep(1000);
-                    qDebug()<<"huozhe"<<endl;
-                    Sleep(1000);
-                    qDebug()<<"haihuozhe"<<endl;
-                    Sleep(1231231324);
                     break;
                 }
             }
@@ -116,6 +101,7 @@ void netdisk::on_login_clicked()
     openFile(("C:\\mycloud\\"+clientname+"\\usrconfig.conf").c_str(),
              ("C:\\mycloud\\"+clientname+"\\").length(),CHECKMD5);
     com.send_message(FINISH_INITIAL,"",false,"","","");
+
     receiveFiles();
     startMonitor("C:\\mycloud\\"+clientname+"\\usrconfig.conf");
     
