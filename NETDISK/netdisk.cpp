@@ -22,7 +22,7 @@ netdisk::~netdisk()
 void netdisk::on_login_clicked()
 {
 
-    /*com.send_usermessage(LOGIN,ui->username->toPlainText().toStdString(),
+    com.send_usermessage(LOGIN,ui->username->toPlainText().toStdString(),
                                    ui->username->toPlainText().toStdString(),
                                    ui->password->toPlainText().toStdString());
     netdisk_message msg;
@@ -32,7 +32,7 @@ void netdisk::on_login_clicked()
         return;
     }
     else
-        ui->show->clear();*/
+        ui->show->clear();
     this->close();
     Dialog_folder df;
     df.show();

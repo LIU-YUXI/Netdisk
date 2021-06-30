@@ -12,6 +12,7 @@
 using namespace std;
 extern Communication com;
 extern netdisk_message msg;
+string FileTree;
 
 void sendfile(string filename,string path,string md5){//还没写断点续传
     string file;
@@ -21,7 +22,7 @@ void sendfile(string filename,string path,string md5){//还没写断点续传
     while (1)
     {
         if(!fin.get(temp_ch)){
-            com.send_message(SEND_FILE,filename,true,path,md5,file);
+            com.send_message(SEND_FILE,filename,true,path,md5,file,-1,true);
             file.clear();
             com.recv_message(msg);
             if(msg.op==FINISH)
@@ -40,7 +41,7 @@ void sendfile(string filename,string path,string md5){//还没写断点续传
     }
 }
 
-string FileTree;
+
 string GbkToUtf8(const char *src_str)
 {
     int len = MultiByteToWideChar(CP_ACP, 0, src_str, -1, NULL, 0);
