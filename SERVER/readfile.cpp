@@ -1,4 +1,6 @@
 #include "./readfile.h"
+#include "../database/Database.h"
+extern Database db;
 int read(const char* filename,string &content)
 {
   std::ifstream in(filename, std::ios::in | std::ios::binary);
@@ -15,8 +17,8 @@ int read(const char* filename,string &content)
     return myERROR;
 }
 // 递归调用
-int userfiles(string userid,const char* rootdir,queue<file>&files,bool is_root){
-    if(!is_root&&/* 不是同步目录 */)
+int userfiles(int userid,const char* rootdir,queue<file>&files,bool is_root){
+    if(!is_root&&!db.directoryIsBind(userid,rootdir))
         return myOK;
     DIR * dir;
     struct dirent * ptr;

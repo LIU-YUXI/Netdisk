@@ -39,6 +39,8 @@ using namespace std;
 #define NORMAL 19
 /* 初始等待询问状态 */
 #define INITIAL_CONSULT 22
+/* 正在接收/发生状态，有外部事件需要等待 */
+#define BUZY 23
 /* 信息發送字符串的信息 */
 #define msgno_begin 0 // string中对应的位置
 #define op_begin 1
@@ -66,7 +68,7 @@ struct netdisk_message{
     netdisk_message(){
         ;
     }
-    netdisk_message(int no,int op,string filename,bool is_file,bool is_tail,string path,string md5,string content,string username,string useerid,string passwd,bool user_correct){
+    netdisk_message(int no,int op,string filename,bool is_file,bool is_tail,string path,string md5,string content,string username,string useerid,string passwd,bool user_correct,bool is_tail){
         this->no=no;
         this->op=op;
         this->filename=filename;
@@ -78,6 +80,7 @@ struct netdisk_message{
         this->userid=userid;
         this->passwd=passwd;
         this->user_correct=user_correct;
+        this->is_tail=is_tail;
     }
 };
 
@@ -104,13 +107,14 @@ public:
     // 发送配置文件
     int send_configmessage(int op,string filename,string content,int no=-1);
     // 發送信息
-    int send_message(int op,string filename,bool is_file,string path="",string md5="",string content="",int no=-1);
+    int send_message(int op,string filename,bool is_file,string path="",string md5="",string content="",int no=-1,int tail=false);
     // 发送用户登录、登出、注册信息
     int send_usermessage(int op,string username,string useri,string passwd,bool user_correct,int no=-1);   
     // 初始化類類型
     Communication(int connfd);
     // 斷開鏈接
     int disconnection();
+    bool neterror();
     ~Communication();
     // 接受來自服務端的信息，並返回到recv_content
     int recv_message(netdisk_message &recv_content);
@@ -123,7 +127,8 @@ public:
     int state_next(netdisk_message msg);
     int state_rst();
     // 接收到登录消息后，确认账号密码对不对，如果对，则把用户名发给客户端，并且把id存到类的数据成员userid里
-    int procs_login(netdisk_message msg);
+    int procs_login(netdisk_message &msg);
+    int procs_regist(netdisk_message msg);
     // 发配置文件
     int send_cfg();
     // 下列两个函数的msg包括要发送的文件的除完整内容外的所有信息
@@ -131,4 +136,6 @@ public:
     int sendfile(netdisk_message msg,string &content);
     // 接收文件，返回已经接收的字节
     int recvfile(netdisk_message msg);
+    // 同一客户端其它用户有事件执行，需要同步
+    int synchronous(netdisk_message msg);
 };

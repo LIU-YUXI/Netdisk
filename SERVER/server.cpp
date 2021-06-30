@@ -19,8 +19,11 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
+#include "./server.h"
 using namespace std;
-
+#include "../database/Database.h"
+Database db;
+map<int, communication> commap;
 int my_daemon(int nochdir, int noclose)
 {
     pid_t pid = fork();
@@ -97,6 +100,8 @@ int open_listenfd(uint16_t port)
 
 int main(int argc, char *argv[])
 {
+    mkdir(USERFILEDIR);
+    mkdir(USERFILEDIR);
     // ÊØ»¤½ø³Ì
     my_daemon(1, 1);
     uint16_t port;
@@ -113,7 +118,6 @@ int main(int argc, char *argv[])
     struct sockaddr_in clientaddr;
     socklen_t clientlen = sizeof(clientaddr);
     int readret, writeret;
-    map<int, communication> commap;
     while (true)
     {
         int eventsNumber = epoll_wait(epfd, events, 2048, -1);

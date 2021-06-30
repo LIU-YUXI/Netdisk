@@ -14,6 +14,6 @@ using namespace std;
 string getFullFileName(int userId, string fileName);
 int sameNameFile(int userId, string fileName, string md5)
 int createFile(int userId, bool isDirectory, string fileName, string md5);
-int deleteFile(int userId, string fileName,string md5);
+int deleteFile(int userId, string fileName);
 int renameFile(int userId, string fileName, string newFileName);
 int updateFile(int userId, string fileName, string md5);
