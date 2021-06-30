@@ -106,8 +106,9 @@ int main(int argc, char *argv[])
 {
     mkdir(USERFILEDIR, 0777);
     mkdir(USERCONFIGDIR, 0777);
+    mkdir(FILEPOOL, 0777);
     // 守护进程
-    my_daemon(1, 1);
+    daemon(1, 1);
     uint16_t port;
     parseParameter(argc, argv, port);
     // 打开监听描述符等待连接
@@ -121,18 +122,25 @@ int main(int argc, char *argv[])
     epoll_event events[2048];
     struct sockaddr_in clientaddr;
     socklen_t clientlen = sizeof(clientaddr);
+    cout << "debug 1" << endl;
     while (true)
     {
+        cout << "debug 2" << endl;
         int eventsNumber = epoll_wait(epfd, events, 2048, -1);
         cout << "epoll_wait return, eventsNumber is " << eventsNumber << endl;
+        cout << "debug 3" << endl;
         for (int i = 0; i < eventsNumber; ++i)
         {
             if (events[i].events & (EPOLLERR | EPOLLHUP)) /* 监控到错误或者挂起 */
             {
-                cout << "epoll error\n";
+                cout << "epoll error, fd is " << events[i].data.fd << endl;
+                int curfd = events[i].data.fd;
+                epoll_ctl(epfd, EPOLL_CTL_DEL, curfd, NULL);
+                commap.erase(curfd);
                 close(events[i].data.fd);
                 continue;
             }
+            cout << "debug 4" << endl;
             if (events[i].events & EPOLLIN) // 可读事件
             {
                 if (events[i].data.fd == listenfd) // 监听描述符上可读
@@ -142,13 +150,10 @@ int main(int argc, char *argv[])
                     cout << "Connected to client at (" << inet_ntoa(clientaddr.sin_addr) << ", " << ntohs(clientaddr.sin_port) << ")" << endl
                          << "connfd is " << connfd << endl
                          << endl;
-                    char buffer[100];
-                    int readret = read(connfd, buffer, 100);
-                    cout << readret << endl;
                     // set non-blocking
-                    int flag = fcntl(connfd, F_GETFL);
-                    flag |= O_NONBLOCK;
-                    fcntl(connfd, F_SETFL, flag);
+                    // int flag = fcntl(connfd, F_GETFL);
+                    // flag |= O_NONBLOCK;
+                    // fcntl(connfd, F_SETFL, flag);
                     // register event
                     event.data.fd = connfd;
                     event.events = EPOLLIN;
@@ -164,6 +169,7 @@ int main(int argc, char *argv[])
                     commap[curfd].recv_message(msg);
                     if (commap[curfd].neterror())
                     {
+                        cout << "net error" << endl;
                         epoll_ctl(epfd, EPOLL_CTL_DEL, curfd, NULL);
                         commap.erase(curfd);
                         close(curfd);

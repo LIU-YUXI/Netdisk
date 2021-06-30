@@ -24,7 +24,8 @@ int userfiles(int userid, string rootdir, queue<file> &files, bool is_root)
     DIR *dir;
     struct dirent *ptr;
     string x, dirPath;
-    dir = opendir(rootdir.c_str());      //打开一个目录
+    cout << rootdir << endl;
+    dir = opendir(rootdir.c_str());      //打开丢�个目彄1�7
     while ((ptr = readdir(dir)) != NULL) //循环读取目录数据
     {
         if ((strcmp(ptr->d_name, ".") == 0) || (strcmp(ptr->d_name, "..") == 0))
@@ -33,6 +34,7 @@ int userfiles(int userid, string rootdir, queue<file> &files, bool is_root)
         ftmp.filename = ptr->d_name;
         ftmp.is_file = ptr->d_type == DT_DIR ? false : true;
         ftmp.path = rootdir + "/" + ftmp.filename;
+        cout << ftmp.path << endl;
         if (ptr->d_type == DT_DIR)
         {
             files.push(ftmp);
@@ -58,6 +60,9 @@ int userfiles(int userid, string rootdir, queue<file> &files, bool is_root)
 int writefile(string filename, string content)
 {
     ofstream outfile(filename, ios::out | ios::app);
+    if (!outfile.is_open())
+        return myERROR;
+    cout << "д��" << filename << endl;
     outfile << content;
     outfile.close();
     return myOK;

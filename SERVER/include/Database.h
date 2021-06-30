@@ -14,6 +14,7 @@ public:
     Database();
     bool accountUsed(string account);
     int addUser(string username, string account, string password);
+    int findIdByAccount(string account, int &id);
     int loginUser(int &id, string &username, string account, string password);
     int addFile(string md5);
     bool fileExists(string md5);
