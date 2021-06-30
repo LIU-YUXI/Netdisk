@@ -635,9 +635,9 @@ int Communication::recvfile(netdisk_message msg)
         cout << "this" << endl;
         recv_message(msgtemp);
         send_message(FINISH, msg.filename, msg.is_file);
-        cout << "content: " << msg.content << endl;
-        cout << "content length: " << msg.content.length() << endl;
-        realOutFile << msg.content;
+        cout << "content: " << msgtemp.content << endl;
+        cout << "content length: " << msgtemp.content.length() << endl;
+        realOutFile << msgtemp.content;
         if (msgtemp.is_tail)
             //if (msgtemp.content.length() != 1024)
             break;
