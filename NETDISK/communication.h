@@ -76,6 +76,7 @@ struct netdisk_message{
         this->userid=userid;
         this->passwd=passwd;
         this->user_correct=user_correct;
+        this->is_tail=is_tail;
     }
 };
 

@@ -6,6 +6,7 @@
 #include<QTime>
 #include<QCoreApplication>
 #include"MD5.h"
+#include<stdio.h>
 #include"communication.h"
 #define logfile "C:\\mycloud\\Liu\\run.log"
 // 宽字节字符串转多字节字符串
@@ -13,6 +14,15 @@ using namespace std;
 extern Communication com;
 extern netdisk_message msg;
 string FileTree;
+
+string retMD5(string filename){
+    ifstream in;
+    in.open((filename.c_str()),ios::in);
+    MD5 m(in);
+    string md5code=m.toString();
+    in.close();
+    return md5code;
+}
 
 void sendfile(string filename,string path,string md5){//还没写断点续传
     string file;
@@ -30,7 +40,7 @@ void sendfile(string filename,string path,string md5){//还没写断点续传
         }
         count++;
         file += temp_ch;
-        if(count==1024){
+        if(count==SENDFILESIZE){
             count=0;
             com.send_message(SEND_FILE,filename,true,path,md5,file);
             file.clear();
@@ -40,8 +50,24 @@ void sendfile(string filename,string path,string md5){//还没写断点续传
         }
     }
 }
-
-
+string retFilename(string in){
+    if(in.find_last_of("\\")!=in.npos){
+        return in.substr(in.find_last_of("\\")+1);
+    }
+    return "";
+}
+bool retifisFile(string path){
+    WIN32_FIND_DATAA fdfile;
+    if(FindFirstFileA(path.c_str(), &fdfile)==INVALID_HANDLE_VALUE){
+        qDebug()<<"error"<<endl;
+        return false;
+    }
+    //qDebug()<<"path"<<QString::fromStdString((dir+"\\"+name))<<endl;
+    if (fdfile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
+        return false;
+    }
+    else return true;
+}
 string GbkToUtf8(const char *src_str)
 {
     int len = MultiByteToWideChar(CP_ACP, 0, src_str, -1, NULL, 0);
@@ -93,15 +119,14 @@ void W2C(wchar_t* pwszSrc, int iSrcLen, char* pszDest, int iDestLen)
         NULL,
         NULL);
 }
-void checkFileschange(const char* dir) {
-    HANDLE dir_handle = CreateFileA(dir, FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+void checkFileschange(string dir,string path) {
+    HANDLE dir_handle = CreateFileA(dir.c_str(), FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 
     if (dir_handle == INVALID_HANDLE_VALUE) {
         exit(0);
     }
 
     char szTemp[MAX_PATH] = { 0 };
-
     BOOL bRet = false;
     DWORD dwRet = 0;
     DWORD dwBufferSize = 2048;
@@ -134,8 +159,8 @@ void checkFileschange(const char* dir) {
             break;
         }
 
-
         // 判断操作类型并显示
+        string oldname;
         while (1) {
             // 将宽字符转换成窄字符
             W2C((wchar_t*)(&pFileNotifyInfo->FileName), pFileNotifyInfo->FileNameLength, szTemp, MAX_PATH);
@@ -144,29 +169,115 @@ void checkFileschange(const char* dir) {
             case FILE_ACTION_ADDED:
             {
                 // 新增文件
-                printf("[File Added Action]%s\n", szTemp);
-                break;
+                qDebug()<<"[File Added Action]\n"<<QString::fromStdString(GbkToUtf8(szTemp))<<endl;
+                string name=GbkToUtf8(szTemp);
+                bool isfile=retifisFile(dir+"\\"+szTemp);              
+                if (isfile){
+                    qDebug()<<"folder"<<endl;
+                    com.send_message(SEND,retFilename(szTemp),false,changegang((path+szTemp)),"","");
+                    com.recv_message(msg);
+                    writeLog(logfile,"Upload a folder","success","Successfully uploaded a folder");
+                }
+                else {
+                    string md5code=retMD5(dir+"\\"+name);
+                    qDebug()<<"file"<<endl;
+                    com.send_message(SEND,retFilename(szTemp),true,changegang((path+szTemp)),md5code,"");
+                    com.recv_message(msg);
+                    if(msg.op==SURE_GET){
+                        sendfile(retFilename(szTemp),changegang(path+szTemp),md5code);
+                        writeLog(logfile,"Upload a new file","success","Successfully uploaded a file");
+                    }
+                    else if(msg.op==NOT_GET){
+                        com.send_message(FINISH,retFilename(szTemp),true,changegang((path+szTemp)),md5code,"");
+                        com.recv_message(msg);
+                        if(msg.op==FINISH){
+                            writeLog(logfile,"Upload an existed file","success","Successfully uploaded a file");
+                        }
+                    }
+                    else if(msg.op==EXIST){
+                        ;
+                    }
+                    break;
+                }
+
+                /*qDebug()<<QString::fromStdString(dir+"\\"+name)<<endl;
+                qDebug()<<QString::fromStdString(md5code)<<endl;
+                qDebug()<<QString::fromStdString(path+name)<<endl;*/
+
             }
             case FILE_ACTION_REMOVED:
             {
-                // 新增文件
-                printf("[File Removed Action]%s\n", szTemp);
+                //删除文件
+                bool isfile=retifisFile(dir+"\\"+szTemp);    
+                if(isfile){
+                    com.send_message(REMOVE,retFilename(szTemp),true,changegang((path+szTemp)),"","");
+                    com.recv_message(msg);
+                    writeLog(logfile,"Remove a file","success","Successfully removed a file");
+                }
+                else{
+                    com.send_message(REMOVE,retFilename(szTemp),false,changegang((path+szTemp)),"","");
+                    com.recv_message(msg);
+                    writeLog(logfile,"Remove a folder","success","Successfully removed a folder");
+                }
+                qDebug()<<"[File Removed Action]\n"<<QString::fromStdString(GbkToUtf8(szTemp))<<endl;
+
+                
                 break;
             }
             case FILE_ACTION_MODIFIED:
             {
-                // 新增文件
-                printf("[File Modified Action]%s\n", szTemp);
+                // 修改文件
+                string name=GbkToUtf8(szTemp);
+                qDebug()<<"[File Modified Action]\n"<< QString::fromStdString(GbkToUtf8(szTemp))<<endl;
+
+
+                qDebug()<<QString::fromStdString(dir+"\\"+name)<<endl;
+                    string md5code=retMD5(dir+"\\"+name);
+                    qDebug()<<QString::fromStdString(md5code)<<endl;
+                    com.send_message(CHANGE,retFilename(szTemp),true,
+                                     changegang(path+szTemp),md5code,"");
+                    com.recv_message(msg);
+                    if(msg.op==SURE_GET){
+                        sendfile(retFilename(szTemp),changegang(path+szTemp),md5code);
+                        writeLog(logfile,"Upload a modified file","success","Successfully uploaded a modified file");
+                    }
+                    else if(msg.op==NOT_GET){
+                        com.send_message(FINISH,retFilename(szTemp),true,changegang((path+szTemp)),md5code,"");
+                        com.recv_message(msg);
+                        if(msg.op==FINISH){
+                            writeLog(logfile,"Upload an existed file","success","Successfully uploaded a file");
+                        }
+                    }
+                    else if(msg.op==EXIST){
+                        ;
+                    }
                 break;
             }
             case FILE_ACTION_RENAMED_NEW_NAME:
             {
-                printf("[File New Name]%s\n", szTemp);
+                string name=GbkToUtf8(szTemp);
+                bool isfile=retifisFile(dir+"\\"+szTemp);
+                if(isfile){
+                    string md5code=retMD5(dir+"\\"+name);
+                    qDebug()<<QString::fromStdString(md5code)<<endl;
+                    com.send_message(RENAME,retFilename(szTemp),true,
+                                     changegang(path+oldname),md5code,"");
+                    com.recv_message(msg);
+                    writeLog(logfile,"Rename a file","success","Successfully uploaded a renamed file");
+                }
+                else{
+                    com.send_message(CHANGE,retFilename(szTemp),false,
+                                     changegang(path+oldname),"","");
+                    com.recv_message(msg);
+                    writeLog(logfile,"Rename a folder","success","Successfully uploaded a renamed folder");
+                }
+                qDebug()<<"[File New Name]\n"<<QString::fromStdString(GbkToUtf8(szTemp))<<endl;
                 break;
             }
             case FILE_ACTION_RENAMED_OLD_NAME:
             {
-                printf("[File Old Name]%s\n", szTemp);
+                qDebug()<<"[File Old Name]\n"<<QString::fromStdString(GbkToUtf8(szTemp))<<endl;
+                oldname=szTemp;
                 break;
             }
             default:
@@ -189,8 +300,8 @@ void checkFileschange(const char* dir) {
     delete[] pBuf;
     pBuf = NULL;
 }
-void openMonitorThread(string dir) {
-    std::thread test1(checkFileschange, dir.c_str());
+void openMonitorThread(string dir,string path) {
+    std::thread test1(checkFileschange, dir,path);
     test1.detach();
     writeLog(logfile,"Add monitor thread","success","Start to monitor "+dir);
     Sleep(10);
@@ -206,8 +317,10 @@ void startMonitor(string file) {
         string line = buff;
         cout << line << endl;
         if (line.find(">") != line.npos) {
-            cout << line.substr(line.find(">") + 1) << endl;
-            openMonitorThread(line.substr(line.find(">") + 1));
+            qDebug() << QString::fromStdString(line.substr(line.find(">") + 1)) << endl;
+            string path=line.substr(line.find_first_of("\\")+1);
+            path=path.erase(path.find(">"));
+            openMonitorThread(line.substr(line.find(">") + 1),path+"\\");
         }
     }
 
@@ -221,7 +334,7 @@ string findlinkFolder(string in,string path,bool &linked,int length) {
 
     path.erase(path.length()- 4);
     string folder = path.substr(length);
-    qDebug()<<QString::fromStdString(folder)<<endl;
+    //qDebug()<<QString::fromStdString(folder)<<endl;
     while (1) {
         if (pos2 == (int)in.length()) {
             return "nothing";
@@ -312,12 +425,11 @@ void open_folder(const char para[], int round, int ctrl[],string content,int len
         FileTree.append(fdfile.cFileName);
         FileTree.append("\n");
         if(opt==CHECKMD5){
-            ifstream in;
-            in.open((fdfile.cFileName),ios::in);
-            MD5 m(in);
-            string md5code=m.toString();
-            in.close();
+
+            string localpath = para;
+            localpath = localpath.erase(localpath.find_last_of("\\") + 1);
             string temp=path+fdfile.cFileName;
+            string md5code=retMD5(localpath+"\\" + (fdfile.cFileName) );
             com.send_message(INITIAL_CLIENT,fdfile.cFileName,true,changegang(temp),md5code,"");
             com.recv_message(msg);//还没处理读到消息后的问题
             if(msg.op==SURE_GET){

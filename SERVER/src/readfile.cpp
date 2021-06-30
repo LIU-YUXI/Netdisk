@@ -1,15 +1,15 @@
 #include "../include/readfile.h"
 #include "../include/Database.h"
 extern Database db;
-int read(const char *filename, string &content)
+int read(string filename, string &content)
 {
-    std::ifstream in(filename, std::ios::in | std::ios::binary);
+    std::ifstream in(filename.c_str(), std::ios::in | std::ios::binary);
     if (in)
     {
         in.seekg(0, std::ios::end);
-        contents.resize(in.tellg());
+        content.resize(in.tellg());
         in.seekg(0, std::ios::beg);
-        in.read(&contents[0], contents.size());
+        in.read(&content[0], content.size());
         in.close();
         return myOK;
     }
@@ -17,14 +17,14 @@ int read(const char *filename, string &content)
         return myERROR;
 }
 // 递归调用
-int userfiles(int userid, const char *rootdir, queue<file> &files, bool is_root)
+int userfiles(int userid, string rootdir, queue<file> &files, bool is_root)
 {
     if (!is_root && !db.directoryIsBind(userid, rootdir))
         return myOK;
     DIR *dir;
     struct dirent *ptr;
     string x, dirPath;
-    dir = opendir(rootdir);              //打开一个目录
+    dir = opendir(rootdir.c_str());      //打开一个目录
     while ((ptr = readdir(dir)) != NULL) //循环读取目录数据
     {
         if ((strcmp(ptr->d_name, ".") == 0) || (strcmp(ptr->d_name, "..") == 0))
@@ -42,7 +42,7 @@ int userfiles(int userid, const char *rootdir, queue<file> &files, bool is_root)
         {
             FILE *fp = NULL;
             string getmd5 = "md5sum " + ftmp.path;
-            if ((fp = popen(getmd5, r)) != NULL)
+            if ((fp = popen(getmd5.c_str(), "r")) != NULL)
             {
                 char md5res[33];
                 fgets(md5res, sizeof(md5res), fp);
@@ -53,23 +53,12 @@ int userfiles(int userid, const char *rootdir, queue<file> &files, bool is_root)
         }
     }
     closedir(dir); //关闭目录指针
+    return myOK;
 }
-int writefile(const char *filename, string content)
+int writefile(string filename, string content)
 {
-    FILE *fp = NULL; // 文件指针
-    errno_t eResult;
-
-    // 以附加方式打开可读/写的文件, 如果没有此文件则会进行创建，然后以附加方式打开可读/写的文件
-    eResult = fopen_s(&fp, filename, "a+");
-
-    // 打开文件失败
-    if (eResult != 0)
-        return myERROR;
-
-    // 将追加内容写入文件指针当前的位置
-    fputs(content.c_str(), fp);
-
-    // 最后不要忘了,关闭打开的文件~~~
-    fclose(fp);
-    return 0;
+    ofstream outfile(filename, ios::out | ios::app);
+    outfile << content;
+    outfile.close();
+    return myOK;
 }

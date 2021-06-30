@@ -1,25 +1,45 @@
-#include "../include/readfile.h"
 #include "../include/Communication.h"
 #include "../include/Database.h"
 #include "../include/crud.h"
 #include "../include/server.h"
 extern Database db;
-extern map<int, communication> commap;
+extern map<int, Communication> commap;
 ostream &operator<<(ostream &out, netdisk_message &msg)
 {
-    
+
     out << "消息号 " << msg.no << endl;
     out << "操作符 " << msg.op << endl;
     out << "文件名 " << msg.filename << endl;
-    out << "路径 " << msg.path <<endl;
+    out << "路径 " << msg.path << endl;
     out << "是否文件 " << msg.is_file << endl;
     out << "是否文件结尾部分 " << msg.is_tail << endl;
     out << "是否文件内容 " << msg.content << endl;
     out << "md5码 " << msg.md5 << endl;
-    out << "用户名 " <<msg.username <<endl;
-    out << "用户账号 "<< msg.userid <<endl;
+    out << "用户名 " << msg.username << endl;
+    out << "用户账号 " << msg.userid << endl;
     out << "用户密码 " << msg.passwd << endl;
-    out << "账号密码是否合法 " <<msg.user_correct << endl;
+    out << "账号密码是否合法 " << msg.user_correct << endl;
+    return out;
+}
+Communication::Communication()
+{
+    memset(message_count_use, 0, MAXMESSAGE);
+}
+Communication::Communication(const Communication &c2)
+{
+    this->configname = c2.configname;
+    this->ConnectError = c2.ConnectError;
+    this->connfd = c2.connfd;
+    this->initialfiles = c2.initialfiles;
+    // this->message_count_use = c2.message_count_use;
+    for (int i = 0; i < MAXMESSAGE; i++)
+    {
+        this->message_count_use[i] = c2.message_count_use[i];
+    }
+    this->msg_doing = c2.msg_doing;
+    this->rootpath = c2.rootpath;
+    this->STATE = c2.STATE;
+    this->userid = c2.userid;
 }
 string Communication::message_to_string(netdisk_message &msg)
 {
@@ -137,7 +157,7 @@ int Communication::send_configmessage(int op, string filename, string content, i
             }
         }
     }
-    netdisk_message msg(message_no, op, filename, 0, , "", "", content, "", "", "", 0, 0);
+    netdisk_message msg(message_no, op, filename, 0, 0, "", "", "", content, "", "", 0);
     string sendstr = message_to_string(msg);
     if (send(connfd, sendstr.c_str(), sendstr.length(), 0) <= 0)
     {
@@ -166,7 +186,7 @@ int Communication::send_usermessage(int op, string username, string userid, stri
             }
         }
     }
-    netdisk_message msg(message_no, op, "", 0, "", "", "", username, userid, passwd, user_correct, 0);
+    netdisk_message msg(message_no, op, "", 0, 0, "", "", "", username, userid, passwd, user_correct);
     string sendstr = message_to_string(msg);
     if (send(connfd, sendstr.c_str(), sendstr.length(), 0) <= 0)
     {
@@ -195,9 +215,9 @@ int Communication::send_message(int op, string filename, bool is_file, string pa
             }
         }
     }
-    netdisk_message msg(message_no, op, filename, is_file, path, md5, content, "", "", "", 0, 0, is_tail);
+    netdisk_message msg(message_no, op, filename, is_file, is_tail, path, md5, content, "", "", "", 0);
     string sendstr = message_to_string(msg);
-    if (send(sclient, sendstr.c_str(), sendstr.length(), 0) <= 0)
+    if (send(connfd, sendstr.c_str(), sendstr.length(), 0) <= 0)
     {
         cout << "fail to send message, please check the network" << endl;
         return myERROR;
@@ -224,17 +244,21 @@ int Communication::recv_message(netdisk_message &recv_content)
 {
     string recvstr;
     char buf[SENDSIZE];
-    if (recv(connfd, buf, SENDSIZE, 0) <= 0)
+    int length = 0;
+    if ((length = recv(connfd, buf, SENDSIZE, 0)) <= 0)
     {
-        this->connecterror = TRUE;
+        this->ConnectError = true;
         return myERROR;
     }
+    buf[length] = 0;
     recvstr = string(buf);
+    cout << recvstr << endl;
     recv_content = string_to_message(recvstr);
+    cout << recv_content << endl;
     if (recv_content.op == FINISH || recv_content.op == EXIST)
     { // 如果通信结束，把消息号释放
         message_count_use[recv_content.no] = 0;
-        for (int i = 0; i < msg_doing.size(); i++)
+        for (int i = 0; i < int(msg_doing.size()); i++)
         {
             if (msg_doing[i].no == recv_content.no)
             {
@@ -250,7 +274,7 @@ int Communication::disconnection()
 {
     if (connecterror() == false)
     {
-        closesocket(connfd);
+        close(connfd);
     }
     return myOK;
 }
@@ -331,7 +355,7 @@ int Communication::state_next(netdisk_message msg)
             {
                 file temp = this->initialfiles.front();
                 // 询问是否要发
-                send_message(INITIAL_SERVER, temp, temp.is_file, temp.path, temp.md5, "");
+                send_message(INITIAL_SERVER, temp.filename, temp.is_file, temp.path, temp.md5, "");
             }
         }
         else
@@ -342,15 +366,15 @@ int Communication::state_next(netdisk_message msg)
                 if (re == 0 || re == 2)
                 {
                     string filename = (re == 0 ? msg.filename : msg.filename + "-crash"); // 冲突
-                    if (fileExists(msg.md5) == false)
+                    if (db.fileExists(msg.md5) == false)
                     { /* 检查文件池里有没有这个文件 */
-                        send_message(SURE_GET, msg.filename, msg.is_file, msg.is_tail, msg.md5, msg.content, msg.no);
+                        send_message(SURE_GET, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
                         // 分裂线程开始接收
                         recvfile(msg);
                     }
                     else
                     {
-                        send_message(NOT_GET, msg.filename, msg.is_file, msg.is_tail, msg.md5, msg.content, msg.no);
+                        send_message(NOT_GET, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
                     }
                 }
                 // 存在且相同
@@ -402,7 +426,7 @@ int Communication::state_next(netdisk_message msg)
     // 正常状态
     else if (this->STATE == NORMAL)
     {
-        if (msg.op == SURE_SEND)
+        if (msg.op == SEND_FILE)
         {
             // 分裂线程开始接收
             recvfile(msg);
@@ -412,22 +436,22 @@ int Communication::state_next(netdisk_message msg)
         {
             int re = sameNameFile(this->userid, msg.filename, msg.md5);           /* 检查文件是否存在 */
             string filename = (re == 0 ? msg.filename : msg.filename + "-crash"); // 冲突
-            if (fileExists(msg.md5) == 0)
+            if (db.fileExists(msg.md5) == 0)
             { /* 检查文件池里有没有这个文件 */
-                send_message(SURE_GET, msg.filename, msg.is_file, msg.is_tail, msg.md5, msg.content, msg.no);
+                send_message(SURE_GET, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
+                // 分裂线程开始接收
+                recvfile(msg);
             }
             else
             {
-                send_message(NOT_GET, msg.filename, msg.is_file, msg.is_tail, msg.md5, msg.content, msg.no);
+                send_message(NOT_GET, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
             }
             
         }
         else if (msg.op == REMOVE)
         {
             deleteFile(userid, msg.path);
-            string md5;
-            read(msg.path,md5);
-            decreaseFileLinks(md5);
+            db.decreaseFileLinks(msg.md5);
             send_message(FINISH, msg.filename, msg.is_file, "", "", "", msg.no);
         }
         else if (msg.op == RENAME)
@@ -438,19 +462,21 @@ int Communication::state_next(netdisk_message msg)
         else if (msg.op == BIND_DIR)
         {
             db.addBindDirectory(this->userid, msg.path);
-            send_message(FINISH, msg.filename, msg.path, "", "", "", msg.no)
+            send_message(FINISH, msg.filename, 0, msg.path, "", "", msg.no);
         }
         else if (msg.op == RM_BIND_DIR)
         {
             db.deleteBindDirectory(this->userid, msg.path);
-            send_message(FINISH, msg.filename, msg.path, "", "", "", msg.no)
+            send_message(FINISH, msg.filename, 0, msg.path, "", "", msg.no);
         }
     }
+    return myOK;
 }
 
 int Communication::state_rst()
 {
     this->STATE = REGIST;
+    return myOK;
 }
 
 int Communication::procs_login(netdisk_message &msg)
@@ -458,36 +484,41 @@ int Communication::procs_login(netdisk_message &msg)
     if (msg.op != LOGIN)
         return myERROR;
     int dbuserid;
-    if (loginUser(dbuserid, msg.username, msg.userid, msg.passwd) == myERROR)
+    if (db.loginUser(dbuserid, msg.username, msg.userid, msg.passwd) == myERROR)
     {
         send_usermessage(LOGIN, msg.username, msg.userid, msg.passwd, false, msg.no);
         return myERROR;
     }
     this->userid = dbuserid;
-    this->configname = USERCONFIGDIR + dbuserid + "/" + "dir.cfg";
+    this->configname = USERCONFIGDIR + dbuserid;
+    this->configname += "/";
+    this->ConnectError += "dir.cfg";
+    this->rootpath = USERFILEDIR + dbuserid;
+    rootpath += '/';
     if (send_usermessage(FINISH, msg.username, msg.userid, msg.passwd, true, msg.no) < 0)
         return myERROR;
     return myOK;
 }
 int Communication::procs_regist(netdisk_message msg)
 {
-    if (db.accountUsed(msg) == true)
+    if (db.accountUsed(msg.userid) == true)
     {
         return myERROR;
     }
     int id = db.addUser(msg.username, msg.userid, msg.passwd);
     string rootpath = USERFILEDIR + id;
-    if (mkdir(rootpath, "0755") == -1)
+    if (mkdir(rootpath.c_str(), 755) == -1)
         return myERROR;
     return myOK;
 }
 int Communication::send_cfg()
 {
+    int msgno;
     string cfgcontent;
-    if (readfile(configname, cfgcontent) >= 0)
+    if (read(configname, cfgcontent) >= 0)
     {
         // 发送目录配置文件
-        int msgno = send_configmessage(CONFIGFILE, configname, cfgcontent);
+        msgno = send_configmessage(SENDCONFIG, configname, cfgcontent);
     }
     return msgno;
 }
@@ -508,7 +539,7 @@ int Communication::recvfile(netdisk_message msg)
 
 bool Communication::neterror()
 {
-    if (connecterror)
+    if (this->ConnectError)
         return true;
     else
         return false;

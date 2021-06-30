@@ -10,15 +10,15 @@ using namespace std;
 #define myOK 0
 #define myERROR -1
 // 读入一个文件
-int read(const char *filename, string &content);
+int read(string filename, string &content);
 struct file
 {
     bool is_file;
     string filename;
-    string md5 = NULL;
+    string md5;
     string path;
 };
 // 将目录下所有文件存入files
-int userfiles(int userid, const char *rootdir, queue<file> &files, bool is_root = false);
+int userfiles(int userid, string rootdir, queue<file> &files, bool is_root = false);
 // 如果存在该文件则往后写，如果不存在则从头写
-int writefile(const char *filename, string content);
+int writefile(string filename, string content);
