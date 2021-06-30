@@ -114,7 +114,7 @@ int Communication::send_configmessage(int op,string filename,string content,int 
     }
     return message_no;
 }
-// è¿”å›æ¶ˆæ¯å·
+// ·µ»ØÏûÏ¢ºÅ
 int Communication::send_usermessage(int op,string username,string userid,string passwd,bool user_correct,int no)
 {
     int message_no=no;
@@ -138,7 +138,7 @@ int Communication::send_usermessage(int op,string username,string userid,string 
     }
     return message_no;
 }
-// è¿”å›æ¶ˆæ¯å·
+// ·µ»ØÏûÏ¢ºÅ
 int Communication::send_message(int op,string filename,bool is_file,string path,string md5,string content,int no,bool is_tail)
 {
     int message_no=no;
@@ -183,7 +183,7 @@ int Communication::recv_message(netdisk_message &recv_content)
     }
     recvstr=string(buf);
     recv_content=string_to_message(recvstr);
-    if(recv_content.op==FINISH||recv_content.op==EXIST){// å¦‚æœé€šä¿¡ç»“æŸï¼ŒæŠŠæ¶ˆæ¯å·é‡Šæ”¾
+    if(recv_content.op==FINISH||recv_content.op==EXIST){// Èç¹ûÍ¨ĞÅ½áÊø£¬°ÑÏûÏ¢ºÅÊÍ·Å
         message_count_use[recv_content.no]=0;
         for(int i=0;i<msg_doing.size();i++){
             if(msg_doing[i].no==recv_content.no){
@@ -240,7 +240,7 @@ int Communication::state_next(netdisk_message msg){
         }
     }
     else if(this->STATE==GETCONFIG){
-        if(msg.op==SENDCONFIG){// æ”¶åˆ°å®¢æˆ·ç«¯å‘æ¥çš„åˆå§‹åŒ–
+        if(msg.op==SENDCONFIG){// ÊÕµ½¿Í»§¶Ë·¢À´µÄ³õÊ¼»¯
             writefile(this->configname,msg.content);
             this->STATE=INITIAL_CLIENT;
             send_message(FINISH,msg.filename,0,"","","",msg.no);
@@ -255,29 +255,29 @@ int Communication::state_next(netdisk_message msg){
     else if(this->STATE==INITIAL_CLIENT){
         if(msg.op==FINISH_INITIAL){
             this->STATE=INITIAL_SERVER;
-            // å¼€å§‹éå†äº‘ç«¯æ–‡ä»¶
+            // ¿ªÊ¼±éÀúÔÆ¶ËÎÄ¼ş
             userfiles(this->userid,this->rootpath,this->initialfiles,true);
             if(!this->initialfiles.empty()){
                 file temp=this->initialfiles.front();
-                // è¯¢é—®æ˜¯å¦è¦å‘
+                // Ñ¯ÎÊÊÇ·ñÒª·¢
                 send_message(INITIAL_SERVER,temp,temp.is_file,temp.path,temp.md5,"");
             }
         }
         else{
             if(msg.op==INITIAL_CLIENT){
-                int re=sameNameFile(this->userid,msg.path,msg.md5)/* æ£€æŸ¥æ–‡ä»¶æ˜¯å¦å­˜åœ¨ */;
+                int re=sameNameFile(this->userid,msg.path,msg.md5)/* ¼ì²éÎÄ¼şÊÇ·ñ´æÔÚ */;
                 if(re==0||re==2){
-                    string filename=(re==0?msg.filename:msg.filename+"-crash"); // å†²çª
-                    if(fileExists(msg.md5)==false){/* æ£€æŸ¥æ–‡ä»¶æ± é‡Œæœ‰æ²¡æœ‰è¿™ä¸ªæ–‡ä»¶ */
+                    string filename=(re==0?msg.filename:msg.filename+"-crash"); // ³åÍ»
+                    if(fileExists(msg.md5)==false){/* ¼ì²éÎÄ¼ş³ØÀïÓĞÃ»ÓĞÕâ¸öÎÄ¼ş */
                         send_message(SURE_GET,msg.filename,msg.is_file,msg.is_tail,msg.md5,msg.content,msg.no);
-                        // åˆ†è£‚çº¿ç¨‹å¼€å§‹æ¥æ”¶
+                        // ·ÖÁÑÏß³Ì¿ªÊ¼½ÓÊÕ
                         recvfile(msg);
                     }
                     else{
                         send_message(NOT_GET,msg.filename,msg.is_file,msg.is_tail,msg.md5,msg.content,msg.no);
                     }
                 }
-                // å­˜åœ¨ä¸”ç›¸åŒ
+                // ´æÔÚÇÒÏàÍ¬
                 else if(re==1){
                     send_message(EXIST,msg.filename,0,"","","",msg.no);
                 }
@@ -285,12 +285,12 @@ int Communication::state_next(netdisk_message msg){
         }
     }
     else if(this->STATE==INITIAL_SERVER){
-        // è¿™é‡Œçš„ç»ˆæ­¢æ˜¯é æˆ‘éå†ç»“æŸä»¥åè‡ªå·±è°ƒç”¨ä¸€ä¸‹state_next
+        // ÕâÀïµÄÖÕÖ¹ÊÇ¿¿ÎÒ±éÀú½áÊøÒÔºó×Ô¼ºµ÷ÓÃÒ»ÏÂstate_next
         if(msg.op==FINISH_INITIAL){
             this->STATE=PROCSEXCP;
         }
-        // éå†äº‘ç«¯çš„æ‰€æœ‰åŒæ­¥æ–‡ä»¶å¤¹
-        // å…ˆæ¥æ”¶ä¸Šä¸€æ¬¡çš„ç»“æœï¼Œå†å‘é€ä¸‹ä¸€æ¬¡çš„
+        // ±éÀúÔÆ¶ËµÄËùÓĞÍ¬²½ÎÄ¼ş¼Ğ
+        // ÏÈ½ÓÊÕÉÏÒ»´ÎµÄ½á¹û£¬ÔÙ·¢ËÍÏÂÒ»´ÎµÄ
         else{
             if(!this->initialfiles.empty()){
                 if(msg.op==SURE_GET){
@@ -301,7 +301,7 @@ int Communication::state_next(netdisk_message msg){
                     this->initialfiles.pop();
                     if(!this->initialfiles.empty()){
                         temp=this->initialfiles.front();
-                        // è¯¢é—®æ˜¯å¦è¦å‘
+                        // Ñ¯ÎÊÊÇ·ñÒª·¢
                         send_message(INITIAL_SERVER,temp.filename,temp.is_file,temp.path,temp.md5,"");
                     }
                     else{
@@ -314,17 +314,17 @@ int Communication::state_next(netdisk_message msg){
     else if(this->STATE==PROCSEXCP){
         this->STATE=NORMAL;
     }
-    // æ­£å¸¸çŠ¶æ€
+    // Õı³£×´Ì¬
     else if(this->STATE==NORMAL){
         if(msg.op==SURE_SEND){
             recvfile(msg);
         }
         else if(msg.op==SEND||msg.op==CHANGE){
-            int re=sameNameFile(this->userid,msg.filename,msg.md5);/* æ£€æŸ¥æ–‡ä»¶æ˜¯å¦å­˜åœ¨ */
-            string filename=(re==0?msg.filename:msg.filename+"-crash"); // å†²çª
-            if(fileExists(msg.md5)==0){/* æ£€æŸ¥æ–‡ä»¶æ± é‡Œæœ‰æ²¡æœ‰è¿™ä¸ªæ–‡ä»¶ */
+            int re=sameNameFile(this->userid,msg.filename,msg.md5);/* ¼ì²éÎÄ¼şÊÇ·ñ´æÔÚ */
+            string filename=(re==0?msg.filename:msg.filename+"-crash"); // ³åÍ»
+            if(fileExists(msg.md5)==0){/* ¼ì²éÎÄ¼ş³ØÀïÓĞÃ»ÓĞÕâ¸öÎÄ¼ş */
                 send_message(SURE_GET,msg.filename,msg.is_file,msg.is_tail,msg.md5,msg.content,msg.no);
-                // åˆ†è£‚çº¿ç¨‹å¼€å§‹æ¥æ”¶
+                // ·ÖÁÑÏß³Ì¿ªÊ¼½ÓÊÕ
                 recvfile(msg);
             }
             else{
@@ -384,20 +384,20 @@ int Communication::procs_regist(netdisk_message msg)
 int Communication::send_cfg(){
     string cfgcontent;
     if(readfile(configname,cfgcontent)>=0){
-        // å‘é€ç›®å½•é…ç½®æ–‡ä»¶
+        // ·¢ËÍÄ¿Â¼ÅäÖÃÎÄ¼ş
         int msgno=send_configmessage(CONFIGFILE,configname,cfgcontent);
     }
     return msgno;
 }
 
 
-// å¦‚æœåŒä¸€ç”¨æˆ·çš„å¦ä¸€ç«¯æœ‰æ–‡ä»¶æ›´æ”¹ï¼Œè¯¥ç«¯ç›´æ¥è°ƒç”¨è¿™ä¸ªå‡½æ•°å‘é€
-// å‘é€æ–‡ä»¶
+// Èç¹ûÍ¬Ò»ÓÃ»§µÄÁíÒ»¶ËÓĞÎÄ¼ş¸ü¸Ä£¬¸Ã¶ËÖ±½Óµ÷ÓÃÕâ¸öº¯Êı·¢ËÍ
+// ·¢ËÍÎÄ¼ş
 int Communication::sendfile(netdisk_message msg,string &content){
     
     return  myOK;
 }
-// æ¥æ”¶æ–‡ä»¶ï¼Œè¿”å›å·²ç»æ¥æ”¶çš„å­—èŠ‚
+// ½ÓÊÕÎÄ¼ş£¬·µ»ØÒÑ¾­½ÓÊÕµÄ×Ö½Ú
 int Communication::recvfile(netdisk_message msg){
 
     return myOK;
@@ -410,13 +410,13 @@ bool Communication::neterror(){
         return false;
 }
 
-// æ¥æ”¶æ–‡ä»¶ï¼Œè¿”å›å·²ç»æ¥æ”¶çš„å­—èŠ‚
+// ½ÓÊÕÎÄ¼ş£¬·µ»ØÒÑ¾­½ÓÊÕµÄ×Ö½Ú
 int Communication::synchronous(netdisk_message msg){
     if(STATE!=NORMAL){
-        msg_doing.push_back(msg);// æ”¾åœ¨å¾…åŠäº‹ä»¶
+        msg_doing.push_back(msg);// ·ÅÔÚ´ı°ìÊÂ¼ş
     }
     else{
-        state_next(msg); ///// è¿˜æ²¡å†™å®Œ
+        state_next(msg); ///// »¹Ã»Ğ´Íê
     }
     return myOK;
 }
