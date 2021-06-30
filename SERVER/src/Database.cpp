@@ -3,6 +3,7 @@ using namespace std;
 
 Database::Database()
 {
+    cout << "calling function: Database constructor" << endl;
     if ((mysql = mysql_init(NULL)) == NULL)
     {
         cout << "mysql_init failed" << endl;
@@ -18,7 +19,9 @@ Database::Database()
 
 bool Database::accountUsed(string account)
 {
+    cout << "calling function: accountUsed" << endl;
     sprintf(queryString, "select * from users where account = '%s'", account.c_str());
+    cout << "queryString: " << queryString << endl;
     if (mysql_query(mysql, queryString))
     {
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
@@ -46,7 +49,9 @@ bool Database::accountUsed(string account)
 
 int Database::addUser(string username, string account, string password)
 {
+    cout << "calling function: addUser" << endl;
     sprintf(queryString, "insert into users(username, account, password) values('%s', '%s', '%s')", username.c_str(), account.c_str(), password.c_str());
+    cout << "queryString: " << queryString << endl;
     if (mysql_query(mysql, queryString))
     {
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
@@ -55,9 +60,39 @@ int Database::addUser(string username, string account, string password)
     return myOK;
 }
 
+int Database::findIdByAccount(string account, int &id)
+{
+    cout << "calling function: findIdByAccount" << endl;
+    sprintf(queryString, "select * from users where account = '%s'", account.c_str());
+    cout << "queryString: " << queryString << endl;
+    if (mysql_query(mysql, queryString))
+    {
+        cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
+        exit(0);
+    }
+    if ((result = mysql_store_result(mysql)) == NULL)
+    {
+        cout << "mysql_store_result failed" << endl;
+        exit(0);
+    }
+    if ((int)mysql_num_rows(result) == 0)
+    {
+        mysql_free_result(result);
+        return myERROR;
+    }
+    while ((row = mysql_fetch_row(result)) != NULL)
+    {
+        id = atoi(row[0]);
+        return myOK;
+    }
+    return myERROR;
+}
+
 int Database::loginUser(int &id, string &username, string account, string password)
 {
+    cout << "calling function: loginUser" << endl;
     sprintf(queryString, "select * from users where account = '%s'", account.c_str());
+    cout << "queryString: " << queryString << endl;
     if (mysql_query(mysql, queryString))
     {
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
@@ -69,9 +104,16 @@ int Database::loginUser(int &id, string &username, string account, string passwo
         return myERROR;
     }
     if ((int)mysql_num_rows(result) == 0)
+    {
+        cout << "ÕËºÅ²»´æÔÚ" << endl;
         return myERROR;
+    }
     while ((row = mysql_fetch_row(result)) != NULL)
     {
+        cout << "id " << row[0] << endl;
+        cout << "username " << row[1] << endl;
+        cout << "account " << row[2] << endl;
+        cout << "password " << row[3] << endl;
         if (!strcmp(row[3], password.c_str()))
         {
             id = atoi(row[0]);
@@ -79,12 +121,15 @@ int Database::loginUser(int &id, string &username, string account, string passwo
             return myOK;
         }
     }
+    cout << "ÃÜÂë´íÎó" << endl;
     return myERROR;
 }
 
 int Database::addFile(string md5)
 {
+    cout << "calling function: addFile" << endl;
     sprintf(queryString, "insert into fileLinks(md5) values('%s')", md5.c_str());
+    cout << "queryString: " << queryString << endl;
     if (mysql_query(mysql, queryString))
     {
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
@@ -95,7 +140,9 @@ int Database::addFile(string md5)
 
 bool Database::fileExists(string md5)
 {
+    cout << "calling function: fileExists" << endl;
     sprintf(queryString, "select * from fileLinks where md5 = '%s'", md5.c_str());
+    cout << "queryString: " << queryString << endl;
     if (mysql_query(mysql, queryString))
     {
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
@@ -120,7 +167,9 @@ bool Database::fileExists(string md5)
 
 int Database::increaseFileLinks(string md5)
 {
+    cout << "calling function: increaseFileLinks" << endl;
     sprintf(queryString, "update fileLinks set links = links + 1 where md5 = '%s'", md5.c_str());
+    cout << "queryString: " << queryString << endl;
     if (mysql_query(mysql, queryString))
     {
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
@@ -131,7 +180,9 @@ int Database::increaseFileLinks(string md5)
 
 int Database::decreaseFileLinks(string md5)
 {
+    cout << "calling function: decreaseFileLinks" << endl;
     sprintf(queryString, "update fileLinks set links = links - 1 where md5 = '%s'", md5.c_str());
+    cout << "queryString: " << queryString << endl;
     if (mysql_query(mysql, queryString))
     {
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
@@ -142,7 +193,9 @@ int Database::decreaseFileLinks(string md5)
 
 int Database::createUserTable(int userId)
 {
+    cout << "calling function: createUserTable" << endl;
     sprintf(queryString, "create table user%d(dirId integer primary key auto_increment, dirName varchar(128)) ", userId);
+    cout << "queryString: " << queryString << endl;
     if (mysql_query(mysql, queryString))
     {
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
@@ -153,7 +206,9 @@ int Database::createUserTable(int userId)
 
 int Database::addLog(int userId, string operation, string message)
 {
+    cout << "calling function: addLog" << endl;
     sprintf(queryString, "insert into logs(userId, operation, message) values(%d, '%s', '%s')", userId, operation.c_str(), message.c_str());
+    cout << "queryString: " << queryString << endl;
     if (mysql_query(mysql, queryString))
     {
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
@@ -164,7 +219,9 @@ int Database::addLog(int userId, string operation, string message)
 
 int Database::addBindDirectory(int userId, string dirName)
 {
+    cout << "calling function: addBindDirectory" << endl;
     sprintf(queryString, "insert into user%d(dirName) values('%s')", userId, dirName.c_str());
+    cout << "queryString: " << queryString << endl;
     if (mysql_query(mysql, queryString))
     {
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
@@ -175,7 +232,9 @@ int Database::addBindDirectory(int userId, string dirName)
 
 bool Database::directoryIsBind(int userId, string dirName)
 {
+    cout << "calling function: directoryIsBind" << endl;
     sprintf(queryString, "select * from user%d where dirName = '%s'", userId, dirName.c_str());
+    cout << "queryString: " << queryString << endl;
     if (mysql_query(mysql, queryString))
     {
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
@@ -194,7 +253,9 @@ bool Database::directoryIsBind(int userId, string dirName)
 
 int Database::deleteBindDirectory(int userId, string dirName)
 {
+    cout << "calling function: deleteBindDirectory" << endl;
     sprintf(queryString, "delete from user%d where dirName = '%s'", userId, dirName.c_str());
+    cout << "queryString: " << queryString << endl;
     if (mysql_query(mysql, queryString))
     {
         cout << "mysql_query failed(" << mysql_error(mysql) << ")" << endl;
@@ -205,5 +266,6 @@ int Database::deleteBindDirectory(int userId, string dirName)
 
 Database::~Database()
 {
+    cout << "Database deconstructor" << endl;
     mysql_close(mysql);
 }

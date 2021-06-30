@@ -1,10 +1,11 @@
 #include "../include/crud.h"
 #include "../include/Database.h"
+#include "../include/server.h"
 // 以下fileName全部指代从用户根目录开始的路径，并且包括文件名，如果目录则包括目录名，最后没有斜杠
 // 如，.../users/1/homework.pdf，则userId为1，fileName为homework.pdf;
 // 如，.../users/1/sports/images/swimming.jpg，则userId为1，fileName为sports/images/swimming.jpg;
 
-string rootPath = "/home/u1951247/netdisk/CRUD/test/";
+string rootPath = USERFILEDIR; //"/home/u1951247/netdisk/CRUD/test/";
 
 string getFullFileName(int userId, string fileName)
 {
@@ -34,6 +35,7 @@ int sameNameFile(int userId, string fileName, string md5)
 int createFile(int userId, bool isDirectory, string fileName, string md5)
 {
     string fullFileName = getFullFileName(userId, fileName);
+    cout << fullFileName << endl;
     if (isDirectory)
     {
         if (mkdir(fullFileName.c_str(), 0755) == -1)
