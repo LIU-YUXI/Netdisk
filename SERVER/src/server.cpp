@@ -19,9 +19,9 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
-#include "./server.h"
+#include "../include/server.h"
 using namespace std;
-#include "../database/Database.h"
+#include "../include/Database.h"
 Database db;
 map<int, communication> commap;
 int my_daemon(int nochdir, int noclose)
