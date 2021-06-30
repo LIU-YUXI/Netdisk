@@ -5,6 +5,22 @@
 #include "../include/server.h"
 extern Database db;
 extern map<int, communication> commap;
+ostream &operator<<(ostream &out, netdisk_message &msg)
+{
+    
+    out << "消息号 " << msg.no << endl;
+    out << "操作符 " << msg.op << endl;
+    out << "文件名 " << msg.filename << endl;
+    out << "路径 " << msg.path <<endl;
+    out << "是否文件 " << msg.is_file << endl;
+    out << "是否文件结尾部分 " << msg.is_tail << endl;
+    out << "是否文件内容 " << msg.content << endl;
+    out << "md5码 " << msg.md5 << endl;
+    out << "用户名 " <<msg.username <<endl;
+    out << "用户账号 "<< msg.userid <<endl;
+    out << "用户密码 " << msg.passwd << endl;
+    out << "账号密码是否合法 " <<msg.user_correct << endl;
+}
 string Communication::message_to_string(netdisk_message &msg)
 {
     string re;
@@ -388,7 +404,9 @@ int Communication::state_next(netdisk_message msg)
     {
         if (msg.op == SURE_SEND)
         {
+            // 分裂线程开始接收
             recvfile(msg);
+            
         }
         else if (msg.op == SEND || msg.op == CHANGE)
         {
@@ -397,18 +415,19 @@ int Communication::state_next(netdisk_message msg)
             if (fileExists(msg.md5) == 0)
             { /* 检查文件池里有没有这个文件 */
                 send_message(SURE_GET, msg.filename, msg.is_file, msg.is_tail, msg.md5, msg.content, msg.no);
-                // 分裂线程开始接收
-                recvfile(msg);
             }
             else
             {
                 send_message(NOT_GET, msg.filename, msg.is_file, msg.is_tail, msg.md5, msg.content, msg.no);
             }
+            
         }
         else if (msg.op == REMOVE)
         {
             deleteFile(userid, msg.path);
-            decreaseFileLinks(msg.md5);
+            string md5;
+            read(msg.path,md5);
+            decreaseFileLinks(md5);
             send_message(FINISH, msg.filename, msg.is_file, "", "", "", msg.no);
         }
         else if (msg.op == RENAME)
@@ -473,11 +492,11 @@ int Communication::send_cfg()
     return msgno;
 }
 
-// 如果同一用户的另一端有文件更改，该端直接调用这个函数发送
 // 发送文件
 int Communication::sendfile(netdisk_message msg, string &content)
 {
-
+    send_message(SEND_FILE,msg.filename,true,msg.path,msg.md5);
+    
     return myOK;
 }
 // 接收文件，返回已经接收的字节
