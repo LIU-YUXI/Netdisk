@@ -5,6 +5,7 @@
 #include<QDebug>
 extern Communication com;
 extern netdisk_message msg;
+extern string clientname;
 
 Dialog_regist::Dialog_regist(QWidget *parent) :
     QDialog(parent),
@@ -21,7 +22,6 @@ Dialog_regist::~Dialog_regist()
 
 void Dialog_regist::on_finish_clicked()
 {
-
     QString passwd1=ui->password1->toPlainText();
     QString passwd2=ui->password2->toPlainText();
     if(passwd1!=passwd2){
@@ -33,15 +33,16 @@ void Dialog_regist::on_finish_clicked()
     com.send_usermessage(REGIST,ui->username->toPlainText().toStdString(),
                          ui->account->toPlainText().toStdString(),
                          passwd1.toStdString());
+
     com.recv_message(msg);
+    print(msg);
     if(!msg.user_correct){
         ui->msg->setText("账号已经存在");
         return;
     }
     ui->msg->clear();
-    if(!msg.user_correct){
+    if(msg.user_correct){
         ui->msg->setText("注册成功,3s后自动跳转");
-        return;
     }
 
     mysleep(3);

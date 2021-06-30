@@ -32,6 +32,8 @@ private slots:
     void on_confirm_clicked();
 
 
+    void on_filearray_clicked();
+
 private:
     Ui::Dialog_folder *ui;
 };

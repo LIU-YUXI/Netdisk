@@ -1,4 +1,19 @@
 #include "./communication.h"
+void print(netdisk_message& msg)
+{
+    qDebug() << "消息号 " << msg.no << endl;
+    qDebug() << "操作符 " << msg.op << endl;
+    qDebug() << "文件名 " << msg.filename.c_str() << endl;
+    qDebug() << "路径 " << msg.path.c_str() <<endl;
+    qDebug() << "是否文件 " << msg.is_file << endl;
+    qDebug() << "是否文件结尾部分 " << msg.is_tail << endl;
+    qDebug() << "是否文件内容 " << msg.content.c_str() << endl;
+    qDebug() << "md5码 " << msg.md5.c_str() << endl;
+    qDebug() << "用户名 " <<msg.username.c_str() <<endl;
+    qDebug() << "用户账号 "<< msg.userid.c_str() <<endl;
+    qDebug() << "用户密码 " << msg.passwd.c_str() << endl;
+    qDebug() << "账号密码是否合法 " <<msg.user_correct << endl;
+}
 string Communication::message_to_string(netdisk_message & msg)
 {
     string re;
@@ -23,13 +38,13 @@ string Communication::message_to_string(netdisk_message & msg)
         if(msg.op!=BIND_DIR&&msg.op!=RM_BIND_DIR){
             re+=msg.md5;
             re+="\t";
-            if(msg.op==SEND_FILE){
+            if(msg.op==SEND_FILE||msg.op==SENDCONFIG ){
                 re+=msg.content;
                 re+="\t";
             }
         }
     }
-
+    qDebug()<<"sendstr"<<re.c_str()<<endl;
     return re;
 }
 
@@ -76,7 +91,7 @@ netdisk_message Communication::string_to_message(string &msg)
                 pos++;
             }
             pos++;
-            if(re.op==SEND_FILE){
+            if(re.op==SEND_FILE||re.op==SENDCONFIG ){
                 while(msg[pos]!='\t'){
                     re.content+=msg[pos];
                     pos++;
@@ -109,6 +124,7 @@ int Communication::send_configmessage(int op,string filename,string content,int 
 // 返回消息号
 int Communication::send_usermessage(int op,string username,string userid,string passwd,int no)
 {
+    qDebug()<<"debug5"<<endl;
     int message_no=no;
     if(no==-1){
         for(int i=1;i<MAXMESSAGE;i++){
@@ -118,18 +134,21 @@ int Communication::send_usermessage(int op,string username,string userid,string 
             }
         }
     }
+    qDebug()<<"debug6"<<endl;
     netdisk_message msg(message_no,op,"",0,"","","",username,userid,passwd,0,0);
     string sendstr=message_to_string(msg);
+    netdisk_message msgtemp=string_to_message(sendstr);
     if(send(sclient,sendstr.c_str(),sendstr.length(),0)<=0){
         cout<<"fail to send message, please check the network"<<endl;
         return myERROR;
     }
+    qDebug()<<"debug7"<<endl;
     if(no==-1)
         message_count_use[message_no]=1;
     return message_no;
 }
 // 返回消息号
-int Communication::send_message(int op,string filename,bool is_file,string path,string md5,string content,int no,bool is_tail)
+int Communication::send_message(int op,string filename,boolean is_file,string path,string md5,string content,int no,boolean is_tail)
 {
     int message_no=no;
     if(no==-1){
@@ -142,6 +161,8 @@ int Communication::send_message(int op,string filename,bool is_file,string path,
     }
     netdisk_message msg(message_no,op,filename,is_file,path,md5,content,"","","",0,is_tail);
     string sendstr=message_to_string(msg);
+    netdisk_message msgtest=string_to_message(sendstr);
+    //cout <<msgtest<<endl;
     if(send(sclient,sendstr.c_str(),sendstr.length(),0)<=0){
         cout<<"fail to send message, please check the network"<<endl;
         return myERROR;
@@ -159,9 +180,16 @@ Communication::Communication(string ip,int port)
     // this->connection();
 }
 int Communication::connection(){
+    WORD sockVersion = MAKEWORD(2, 2);
+    WSADATA wsaData;
+    if (WSAStartup(sockVersion, &wsaData) != 0)
+    {
+        return 0;
+    }
     sclient = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(sclient == INVALID_SOCKET)
     {
+        qDebug()<<strerror(errno)<<endl;
         cout<<"invalid socket!"<<endl;
         this->ConnectError=true;
         return myERROR;
@@ -180,7 +208,7 @@ int Communication::connection(){
     return myOK;
 }
 
-bool Communication::connecterror(){
+boolean Communication::connecterror(){
     return this->ConnectError;
 }
 
@@ -195,6 +223,7 @@ int Communication::recv_message(netdisk_message &recv_content)
     if(recv_content.op==FINISH){// 如果通信结束，把消息号释放
         message_count_use[recv_content.no]=0;
     }
+    //print(recv_content);
     return myOK;
 }
 

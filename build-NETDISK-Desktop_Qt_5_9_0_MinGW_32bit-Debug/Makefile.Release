@@ -759,52 +759,7 @@ release/dialog_download.o: ../NETDISK/dialog_download.cpp ../NETDISK/dialog_down
 		../../../QTopen/5.9/mingw53_32/include/QtCore/qfiledevice.h \
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qvector2d.h \
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qtouchdevice.h \
-		ui_dialog_download.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/QVariant \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QAction \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qaction.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qicon.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qactiongroup.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QApplication \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qapplication.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qcoreapplication.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qeventloop.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qdesktopwidget.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qguiapplication.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qinputmethod.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QButtonGroup \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qbuttongroup.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QHeaderView \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qheaderview.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemview.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractscrollarea.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qframe.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qabstractitemmodel.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qitemselectionmodel.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemdelegate.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyleoption.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractspinbox.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qvalidator.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qregularexpression.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qslider.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractslider.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyle.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabbar.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabwidget.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qrubberband.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QLabel \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qlabel.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QPushButton \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qpushbutton.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractbutton.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QTextBrowser \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtextbrowser.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtextedit.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextdocument.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextoption.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextcursor.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextformat.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qpen.h
+		ui_dialog_download.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\dialog_download.o ..\NETDISK\dialog_download.cpp
 
 release/dialog_folder.o: ../NETDISK/dialog_folder.cpp ../NETDISK/dialog_folder.h \
@@ -910,58 +865,6 @@ release/dialog_folder.o: ../NETDISK/dialog_folder.cpp ../NETDISK/dialog_folder.h
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qvector2d.h \
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qtouchdevice.h \
 		ui_dialog_folder.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/QVariant \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QAction \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qaction.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qicon.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qactiongroup.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QApplication \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qapplication.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qcoreapplication.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qeventloop.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qdesktopwidget.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qguiapplication.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qinputmethod.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QButtonGroup \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qbuttongroup.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QHeaderView \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qheaderview.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemview.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractscrollarea.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qframe.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qabstractitemmodel.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qitemselectionmodel.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemdelegate.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyleoption.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractspinbox.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qvalidator.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qregularexpression.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qslider.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractslider.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyle.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabbar.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabwidget.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qrubberband.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QLabel \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qlabel.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QPlainTextEdit \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qplaintextedit.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtextedit.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextdocument.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextoption.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextcursor.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextformat.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qpen.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qabstracttextdocumentlayout.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextlayout.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qglyphrun.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qrawfont.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qfontdatabase.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QPushButton \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qpushbutton.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractbutton.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QTextBrowser \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtextbrowser.h \
 		../NETDISK/fileactions.h \
 		../../../QTopen/5.9/mingw53_32/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\dialog_folder.o ..\NETDISK\dialog_folder.cpp
@@ -1069,50 +972,6 @@ release/dialog_regist.o: ../NETDISK/dialog_regist.cpp ../NETDISK/dialog_regist.h
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qvector2d.h \
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qtouchdevice.h \
 		ui_dialog_regist.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/QVariant \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QAction \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qaction.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qicon.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qactiongroup.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QApplication \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qapplication.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qcoreapplication.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qeventloop.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qdesktopwidget.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qguiapplication.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qinputmethod.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QButtonGroup \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qbuttongroup.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QHeaderView \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qheaderview.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemview.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractscrollarea.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qframe.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qabstractitemmodel.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qitemselectionmodel.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemdelegate.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyleoption.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractspinbox.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qvalidator.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qregularexpression.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qslider.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractslider.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyle.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabbar.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabwidget.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qrubberband.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QLabel \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qlabel.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QPushButton \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qpushbutton.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractbutton.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QTextEdit \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtextedit.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextdocument.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextoption.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextcursor.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextformat.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qpen.h \
 		../NETDISK/communication.h \
 		../../../QTopen/5.9/mingw53_32/include/QtCore/QDebug \
 		../NETDISK/fileactions.h
@@ -1338,60 +1197,13 @@ release/netdisk.o: ../NETDISK/netdisk.cpp ../NETDISK/netdisk.h \
 		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabwidget.h \
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qicon.h \
 		ui_netdisk.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/QVariant \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QAction \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qaction.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qactiongroup.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QApplication \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qapplication.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qcoreapplication.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qeventloop.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qdesktopwidget.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qguiapplication.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qinputmethod.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QButtonGroup \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qbuttongroup.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QHeaderView \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qheaderview.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemview.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractscrollarea.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qframe.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qabstractitemmodel.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qitemselectionmodel.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemdelegate.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyleoption.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractspinbox.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qvalidator.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qregularexpression.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qslider.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractslider.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyle.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabbar.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qrubberband.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QLabel \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qlabel.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QMenuBar \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qmenubar.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qmenu.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QPushButton \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qpushbutton.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractbutton.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QStatusBar \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstatusbar.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QTextEdit \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtextedit.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextdocument.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextoption.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextcursor.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextformat.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qpen.h \
-		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QWidget \
 		../NETDISK/dialog_folder.h \
 		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QDialog \
 		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qdialog.h \
 		../NETDISK/dialog_regist.h \
 		../NETDISK/communication.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/QDebug
+		../../../QTopen/5.9/mingw53_32/include/QtCore/QDebug \
+		../NETDISK/fileactions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\netdisk.o ..\NETDISK\netdisk.cpp
 
 release/fileactions.o: ../NETDISK/fileactions.cpp ../NETDISK/fileactions.h \
@@ -1462,10 +1274,11 @@ release/fileactions.o: ../NETDISK/fileactions.cpp ../NETDISK/fileactions.h \
 		../../../QTopen/5.9/mingw53_32/include/QtCore/QCoreApplication \
 		../../../QTopen/5.9/mingw53_32/include/QtCore/qcoreapplication.h \
 		../../../QTopen/5.9/mingw53_32/include/QtCore/qeventloop.h \
-		../NETDISK/MD5.h
+		../NETDISK/MD5.h \
+		../NETDISK/communication.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\fileactions.o ..\NETDISK\fileactions.cpp
 
-release/MD5.o: ../NETDISK/MD5.cpp ../NETDISK/MD5.h
+release/MD5.o: ../NETDISK/MD5.cpp ../NETDISK/md5.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o release\MD5.o ..\NETDISK\MD5.cpp
 
 release/moc_dialog_download.o: release/moc_dialog_download.cpp 
