@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <unistd.h>
+#include <getopt.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -20,10 +21,13 @@
 #include <fstream>
 #include <ctime>
 #include "../include/server.h"
-using namespace std;
 #include "../include/Database.h"
+#include "../include/Communication.h"
+#include <map>
+using namespace std;
+typedef struct sockaddr SA;
 Database db;
-map<int, communication> commap;
+map<int, Communication> commap;
 int my_daemon(int nochdir, int noclose)
 {
     pid_t pid = fork();
@@ -100,8 +104,8 @@ int open_listenfd(uint16_t port)
 
 int main(int argc, char *argv[])
 {
-    mkdir(USERFILEDIR);
-    mkdir(USERFILEDIR);
+    mkdir(USERFILEDIR, 0777);
+    mkdir(USERCONFIGDIR, 0777);
     // 守护进程
     my_daemon(1, 1);
     uint16_t port;
@@ -117,15 +121,15 @@ int main(int argc, char *argv[])
     epoll_event events[2048];
     struct sockaddr_in clientaddr;
     socklen_t clientlen = sizeof(clientaddr);
-    int readret, writeret;
     while (true)
     {
         int eventsNumber = epoll_wait(epfd, events, 2048, -1);
+        cout << "epoll_wait return, eventsNumber is " << eventsNumber << endl;
         for (int i = 0; i < eventsNumber; ++i)
         {
             if (events[i].events & (EPOLLERR | EPOLLHUP)) /* 监控到错误或者挂起 */
             {
-                outfile << "epoll error\n";
+                cout << "epoll error\n";
                 close(events[i].data.fd);
                 continue;
             }
@@ -136,7 +140,11 @@ int main(int argc, char *argv[])
                     // accept socket connection
                     int connfd = accept(listenfd, (SA *)&clientaddr, &clientlen);
                     cout << "Connected to client at (" << inet_ntoa(clientaddr.sin_addr) << ", " << ntohs(clientaddr.sin_port) << ")" << endl
+                         << "connfd is " << connfd << endl
                          << endl;
+                    char buffer[100];
+                    int readret = read(connfd, buffer, 100);
+                    cout << readret << endl;
                     // set non-blocking
                     int flag = fcntl(connfd, F_GETFL);
                     flag |= O_NONBLOCK;
@@ -145,15 +153,16 @@ int main(int argc, char *argv[])
                     event.data.fd = connfd;
                     event.events = EPOLLIN;
                     epoll_ctl(epfd, EPOLL_CTL_ADD, connfd, &event);
-                    communication newCom(connfd);
+                    Communication newCom(connfd);
                     commap.insert({connfd, newCom});
                 }
                 else // 已连接描述符上可读
                 {
+                    cout << "readable" << endl;
                     int curfd = events[i].data.fd;
                     netdisk_message msg;
                     commap[curfd].recv_message(msg);
-                    if (commap[curfd].disconnected())
+                    if (commap[curfd].neterror())
                     {
                         epoll_ctl(epfd, EPOLL_CTL_DEL, curfd, NULL);
                         commap.erase(curfd);

@@ -12,7 +12,7 @@ using namespace std;
 #define myOK 0
 #define myERROR -1
 string getFullFileName(int userId, string fileName);
-int sameNameFile(int userId, string fileName, string md5)
+int sameNameFile(int userId, string fileName, string md5);
 int createFile(int userId, bool isDirectory, string fileName, string md5);
 int deleteFile(int userId, string fileName);
 int renameFile(int userId, string fileName, string newFileName);
