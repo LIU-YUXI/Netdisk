@@ -52,7 +52,8 @@ SOURCES       = ..\NETDISK\communication.cpp \
 		..\NETDISK\dialog_regist.cpp \
 		..\NETDISK\main.cpp \
 		..\NETDISK\netdisk.cpp \
-		..\NETDISK\fileactions.cpp debug\moc_dialog_download.cpp \
+		..\NETDISK\fileactions.cpp \
+		..\NETDISK\MD5.cpp debug\moc_dialog_download.cpp \
 		debug\moc_dialog_folder.cpp \
 		debug\moc_dialog_regist.cpp \
 		debug\moc_netdisk.cpp
@@ -63,6 +64,7 @@ OBJECTS       = debug/communication.o \
 		debug/main.o \
 		debug/netdisk.o \
 		debug/fileactions.o \
+		debug/MD5.o \
 		debug/moc_dialog_download.o \
 		debug/moc_dialog_folder.o \
 		debug/moc_dialog_regist.o \
@@ -73,13 +75,15 @@ DIST          =  ..\NETDISK\communication.h \
 		..\NETDISK\dialog_folder.h \
 		..\NETDISK\dialog_regist.h \
 		..\NETDISK\netdisk.h \
-		..\NETDISK\fileactions.h ..\NETDISK\communication.cpp \
+		..\NETDISK\fileactions.h \
+		..\NETDISK\MD5.h ..\NETDISK\communication.cpp \
 		..\NETDISK\dialog_download.cpp \
 		..\NETDISK\dialog_folder.cpp \
 		..\NETDISK\dialog_regist.cpp \
 		..\NETDISK\main.cpp \
 		..\NETDISK\netdisk.cpp \
-		..\NETDISK\fileactions.cpp
+		..\NETDISK\fileactions.cpp \
+		..\NETDISK\MD5.cpp
 QMAKE_TARGET  = NETDISK
 DESTDIR        = debug\ #avoid trailing-slash linebreak
 TARGET         = NETDISK.exe
@@ -99,10 +103,10 @@ qmake: FORCE
 qmake_all: FORCE
 
 dist:
-	$(ZIP) NETDISK.zip $(SOURCES) $(DIST) ..\NETDISK\NETDISK.pro ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\spec_pre.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\qdevice.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\device_config.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\common\g++-base.conf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\common\angle.conf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\common\sanitize.conf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\common\gcc-base.conf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\qconfig.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3danimation.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3danimation_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dcore.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dcore_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dextras.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dextras_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dinput.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dinput_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dlogic.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dlogic_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquick.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquick_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickanimation.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickanimation_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickextras.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickextras_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickinput.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickinput_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickrender.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickrender_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickscene2d.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickscene2d_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3drender.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3drender_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_accessibility_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_axbase.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_axbase_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_axcontainer.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_axcontainer_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_axserver.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_axserver_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_bluetooth.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_bluetooth_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_bootstrap_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_concurrent.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_concurrent_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_core.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_core_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_dbus.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_dbus_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_designer.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_designer_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_designercomponents_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_devicediscovery_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_egl_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_eventdispatcher_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_fb_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_fontdatabase_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_gamepad.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_gamepad_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_gui.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_gui_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_help.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_help_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_location.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_location_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_multimedia.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_multimedia_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_multimediawidgets.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_multimediawidgets_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_network.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_network_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_nfc.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_nfc_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_opengl.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_opengl_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_openglextensions.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_openglextensions_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_packetprotocol_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_platformcompositor_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_positioning.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_positioning_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_printsupport.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_printsupport_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_qml.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_qml_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_qmldebug_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_qmldevtools_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_qmltest.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_qmltest_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_qtmultimediaquicktools_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quick.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quick_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quickcontrols2.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quickcontrols2_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quickparticles_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quicktemplates2_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quickwidgets.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quickwidgets_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_scxml.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_scxml_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_sensors.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_sensors_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_serialbus.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_serialbus_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_serialport.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_serialport_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_sql.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_sql_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_svg.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_svg_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_testlib.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_testlib_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_theme_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_uiplugin.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_uitools.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_uitools_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_webchannel.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_webchannel_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_websockets.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_websockets_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_widgets.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_widgets_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_winextras.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_winextras_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_xml.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_xml_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_xmlpatterns.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_xmlpatterns_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\qt_functions.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\qt_config.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\win32-g++\qmake.conf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\spec_post.prf .qmake.stash ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\exclusive_builds.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\toolchain.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\default_pre.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\win32\default_pre.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\resolve_config.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\exclusive_builds_post.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\default_post.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\build_pass.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\qml_debug.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\precompile_header.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\warn_on.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\qt.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\resources.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\moc.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\win32\opengl.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\uic.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\qmake_use.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\file_copies.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\win32\windows.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\testcase_targets.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\exceptions.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\yacc.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\lex.prf ..\NETDISK\NETDISK.pro ..\..\..\QTopen\5.9\mingw53_32\lib\qtmaind.prl ..\..\..\QTopen\5.9\mingw53_32\lib\Qt5Widgetsd.prl ..\..\..\QTopen\5.9\mingw53_32\lib\Qt5Guid.prl ..\..\..\QTopen\5.9\mingw53_32\lib\Qt5Cored.prl    ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\data\dummy.cpp ..\NETDISK\communication.h ..\NETDISK\dialog_download.h ..\NETDISK\dialog_folder.h ..\NETDISK\dialog_regist.h ..\NETDISK\netdisk.h ..\NETDISK\fileactions.h ..\NETDISK\communication.cpp ..\NETDISK\dialog_download.cpp ..\NETDISK\dialog_folder.cpp ..\NETDISK\dialog_regist.cpp ..\NETDISK\main.cpp ..\NETDISK\netdisk.cpp ..\NETDISK\fileactions.cpp ..\NETDISK\dialog_download.ui ..\NETDISK\dialog_folder.ui ..\NETDISK\dialog_regist.ui ..\NETDISK\netdisk.ui    
+	$(ZIP) NETDISK.zip $(SOURCES) $(DIST) ..\NETDISK\NETDISK.pro ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\spec_pre.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\qdevice.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\device_config.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\common\g++-base.conf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\common\angle.conf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\common\sanitize.conf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\common\gcc-base.conf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\qconfig.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3danimation.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3danimation_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dcore.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dcore_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dextras.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dextras_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dinput.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dinput_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dlogic.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dlogic_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquick.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquick_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickanimation.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickanimation_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickextras.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickextras_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickinput.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickinput_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickrender.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickrender_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickscene2d.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3dquickscene2d_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3drender.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_3drender_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_accessibility_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_axbase.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_axbase_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_axcontainer.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_axcontainer_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_axserver.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_axserver_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_bluetooth.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_bluetooth_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_bootstrap_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_concurrent.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_concurrent_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_core.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_core_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_dbus.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_dbus_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_designer.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_designer_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_designercomponents_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_devicediscovery_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_egl_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_eventdispatcher_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_fb_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_fontdatabase_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_gamepad.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_gamepad_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_gui.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_gui_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_help.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_help_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_location.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_location_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_multimedia.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_multimedia_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_multimediawidgets.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_multimediawidgets_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_network.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_network_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_nfc.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_nfc_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_opengl.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_opengl_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_openglextensions.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_openglextensions_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_packetprotocol_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_platformcompositor_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_positioning.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_positioning_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_printsupport.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_printsupport_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_qml.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_qml_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_qmldebug_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_qmldevtools_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_qmltest.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_qmltest_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_qtmultimediaquicktools_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quick.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quick_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quickcontrols2.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quickcontrols2_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quickparticles_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quicktemplates2_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quickwidgets.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_quickwidgets_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_scxml.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_scxml_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_sensors.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_sensors_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_serialbus.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_serialbus_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_serialport.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_serialport_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_sql.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_sql_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_svg.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_svg_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_testlib.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_testlib_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_theme_support_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_uiplugin.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_uitools.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_uitools_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_webchannel.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_webchannel_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_websockets.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_websockets_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_widgets.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_widgets_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_winextras.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_winextras_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_xml.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_xml_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_xmlpatterns.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\modules\qt_lib_xmlpatterns_private.pri ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\qt_functions.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\qt_config.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\win32-g++\qmake.conf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\spec_post.prf .qmake.stash ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\exclusive_builds.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\toolchain.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\default_pre.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\win32\default_pre.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\resolve_config.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\exclusive_builds_post.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\default_post.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\build_pass.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\qml_debug.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\precompile_header.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\warn_on.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\qt.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\resources.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\moc.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\win32\opengl.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\uic.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\qmake_use.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\file_copies.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\win32\windows.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\testcase_targets.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\exceptions.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\yacc.prf ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\lex.prf ..\NETDISK\NETDISK.pro ..\..\..\QTopen\5.9\mingw53_32\lib\qtmaind.prl ..\..\..\QTopen\5.9\mingw53_32\lib\Qt5Widgetsd.prl ..\..\..\QTopen\5.9\mingw53_32\lib\Qt5Guid.prl ..\..\..\QTopen\5.9\mingw53_32\lib\Qt5Cored.prl    ..\..\..\QTopen\5.9\mingw53_32\mkspecs\features\data\dummy.cpp ..\NETDISK\communication.h ..\NETDISK\dialog_download.h ..\NETDISK\dialog_folder.h ..\NETDISK\dialog_regist.h ..\NETDISK\netdisk.h ..\NETDISK\fileactions.h ..\NETDISK\MD5.h ..\NETDISK\communication.cpp ..\NETDISK\dialog_download.cpp ..\NETDISK\dialog_folder.cpp ..\NETDISK\dialog_regist.cpp ..\NETDISK\main.cpp ..\NETDISK\netdisk.cpp ..\NETDISK\fileactions.cpp ..\NETDISK\MD5.cpp ..\NETDISK\dialog_download.ui ..\NETDISK\dialog_folder.ui ..\NETDISK\dialog_regist.ui ..\NETDISK\netdisk.ui    
 
 clean: compiler_clean 
-	-$(DEL_FILE) debug\communication.o debug\dialog_download.o debug\dialog_folder.o debug\dialog_regist.o debug\main.o debug\netdisk.o debug\fileactions.o debug\moc_dialog_download.o debug\moc_dialog_folder.o debug\moc_dialog_regist.o debug\moc_netdisk.o
+	-$(DEL_FILE) debug\communication.o debug\dialog_download.o debug\dialog_folder.o debug\dialog_regist.o debug\main.o debug\netdisk.o debug\fileactions.o debug\MD5.o debug\moc_dialog_download.o debug\moc_dialog_folder.o debug\moc_dialog_regist.o debug\moc_netdisk.o
 
 distclean: clean 
 	-$(DEL_FILE) .qmake.stash
@@ -589,7 +593,68 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_ui
 
 ####### Compile
 
-debug/communication.o: ../NETDISK/communication.cpp ../NETDISK/communication.h
+debug/communication.o: ../NETDISK/communication.cpp ../NETDISK/communication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/QDebug \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qdebug.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qalgorithms.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qglobal.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qconfig-bootstrapped.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qconfig.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qtcore-config.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qsystemdetection.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qprocessordetection.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qcompilerdetection.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qtypeinfo.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qsysinfo.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qlogging.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qflags.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qatomic.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qbasicatomic.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qatomic_bootstrap.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qgenericatomic.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qatomic_cxx11.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qatomic_msvc.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qglobalstatic.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qmutex.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qnumeric.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qversiontagging.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qhash.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qchar.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qiterator.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qlist.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qrefcount.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qarraydata.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qhashfunctions.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qpair.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qbytearraylist.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qbytearray.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qnamespace.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qstring.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qstringbuilder.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qstringlist.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qregexp.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qstringmatcher.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qmap.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qtextstream.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qiodevice.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qobject.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qobjectdefs.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qobjectdefs_impl.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qcoreevent.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qscopedpointer.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qmetatype.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qvarlengtharray.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qcontainerfwd.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qobject_impl.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qlocale.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qvariant.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qshareddata.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qvector.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qpoint.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qset.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qcontiguouscache.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qsharedpointer.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qsharedpointer_impl.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\communication.o ..\NETDISK\communication.cpp
 
 debug/dialog_download.o: ../NETDISK/dialog_download.cpp ../NETDISK/dialog_download.h \
@@ -694,7 +759,52 @@ debug/dialog_download.o: ../NETDISK/dialog_download.cpp ../NETDISK/dialog_downlo
 		../../../QTopen/5.9/mingw53_32/include/QtCore/qfiledevice.h \
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qvector2d.h \
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qtouchdevice.h \
-		ui_dialog_download.h
+		ui_dialog_download.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/QVariant \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QAction \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qaction.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qicon.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qactiongroup.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QApplication \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qapplication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qcoreapplication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qeventloop.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qdesktopwidget.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qguiapplication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qinputmethod.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QButtonGroup \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qbuttongroup.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QHeaderView \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qheaderview.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemview.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractscrollarea.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qframe.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemdelegate.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyleoption.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractspinbox.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qvalidator.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qregularexpression.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qslider.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractslider.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyle.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabbar.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabwidget.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qrubberband.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QLabel \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qlabel.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QPushButton \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qpushbutton.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractbutton.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QTextBrowser \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtextbrowser.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtextedit.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextdocument.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextoption.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextcursor.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextformat.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qpen.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\dialog_download.o ..\NETDISK\dialog_download.cpp
 
 debug/dialog_folder.o: ../NETDISK/dialog_folder.cpp ../NETDISK/dialog_folder.h \
@@ -800,6 +910,58 @@ debug/dialog_folder.o: ../NETDISK/dialog_folder.cpp ../NETDISK/dialog_folder.h \
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qvector2d.h \
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qtouchdevice.h \
 		ui_dialog_folder.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/QVariant \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QAction \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qaction.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qicon.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qactiongroup.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QApplication \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qapplication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qcoreapplication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qeventloop.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qdesktopwidget.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qguiapplication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qinputmethod.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QButtonGroup \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qbuttongroup.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QHeaderView \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qheaderview.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemview.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractscrollarea.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qframe.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemdelegate.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyleoption.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractspinbox.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qvalidator.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qregularexpression.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qslider.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractslider.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyle.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabbar.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabwidget.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qrubberband.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QLabel \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qlabel.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QPlainTextEdit \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qplaintextedit.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtextedit.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextdocument.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextoption.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextcursor.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextformat.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qpen.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qabstracttextdocumentlayout.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextlayout.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qglyphrun.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qrawfont.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qfontdatabase.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QPushButton \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qpushbutton.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractbutton.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QTextBrowser \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtextbrowser.h \
 		../NETDISK/fileactions.h \
 		../../../QTopen/5.9/mingw53_32/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\dialog_folder.o ..\NETDISK\dialog_folder.cpp
@@ -906,7 +1068,54 @@ debug/dialog_regist.o: ../NETDISK/dialog_regist.cpp ../NETDISK/dialog_regist.h \
 		../../../QTopen/5.9/mingw53_32/include/QtCore/qfiledevice.h \
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qvector2d.h \
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qtouchdevice.h \
-		ui_dialog_regist.h
+		ui_dialog_regist.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/QVariant \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QAction \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qaction.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qicon.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qactiongroup.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QApplication \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qapplication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qcoreapplication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qeventloop.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qdesktopwidget.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qguiapplication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qinputmethod.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QButtonGroup \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qbuttongroup.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QHeaderView \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qheaderview.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemview.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractscrollarea.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qframe.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemdelegate.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyleoption.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractspinbox.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qvalidator.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qregularexpression.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qslider.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractslider.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyle.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabbar.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabwidget.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qrubberband.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QLabel \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qlabel.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QPushButton \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qpushbutton.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractbutton.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QTextEdit \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtextedit.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextdocument.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextoption.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextcursor.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextformat.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qpen.h \
+		../NETDISK/communication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/QDebug \
+		../NETDISK/fileactions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\dialog_regist.o ..\NETDISK\dialog_regist.cpp
 
 debug/main.o: ../NETDISK/main.cpp ../NETDISK/netdisk.h \
@@ -1019,7 +1228,9 @@ debug/main.o: ../NETDISK/main.cpp ../NETDISK/netdisk.h \
 		../../../QTopen/5.9/mingw53_32/include/QtCore/qeventloop.h \
 		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qdesktopwidget.h \
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qguiapplication.h \
-		../../../QTopen/5.9/mingw53_32/include/QtGui/qinputmethod.h
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qinputmethod.h \
+		../NETDISK/communication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\main.o ..\NETDISK\main.cpp
 
 debug/netdisk.o: ../NETDISK/netdisk.cpp ../NETDISK/netdisk.h \
@@ -1127,10 +1338,60 @@ debug/netdisk.o: ../NETDISK/netdisk.cpp ../NETDISK/netdisk.h \
 		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabwidget.h \
 		../../../QTopen/5.9/mingw53_32/include/QtGui/qicon.h \
 		ui_netdisk.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/QVariant \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QAction \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qaction.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qactiongroup.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QApplication \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qapplication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qcoreapplication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qeventloop.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qdesktopwidget.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qguiapplication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qinputmethod.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QButtonGroup \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qbuttongroup.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QHeaderView \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qheaderview.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemview.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractscrollarea.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qframe.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qabstractitemmodel.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qitemselectionmodel.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractitemdelegate.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyleoption.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractspinbox.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qvalidator.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qregularexpression.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qslider.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractslider.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstyle.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtabbar.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qrubberband.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QLabel \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qlabel.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QMenuBar \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qmenubar.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qmenu.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QPushButton \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qpushbutton.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qabstractbutton.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QStatusBar \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qstatusbar.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QTextEdit \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qtextedit.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextdocument.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextoption.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextcursor.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qtextformat.h \
+		../../../QTopen/5.9/mingw53_32/include/QtGui/qpen.h \
+		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QWidget \
 		../NETDISK/dialog_folder.h \
 		../../../QTopen/5.9/mingw53_32/include/QtWidgets/QDialog \
 		../../../QTopen/5.9/mingw53_32/include/QtWidgets/qdialog.h \
-		../NETDISK/dialog_regist.h
+		../NETDISK/dialog_regist.h \
+		../NETDISK/communication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\netdisk.o ..\NETDISK\netdisk.cpp
 
 debug/fileactions.o: ../NETDISK/fileactions.cpp ../NETDISK/fileactions.h \
@@ -1194,8 +1455,18 @@ debug/fileactions.o: ../NETDISK/fileactions.cpp ../NETDISK/fileactions.h \
 		../../../QTopen/5.9/mingw53_32/include/QtCore/qset.h \
 		../../../QTopen/5.9/mingw53_32/include/QtCore/qcontiguouscache.h \
 		../../../QTopen/5.9/mingw53_32/include/QtCore/qsharedpointer.h \
-		../../../QTopen/5.9/mingw53_32/include/QtCore/qsharedpointer_impl.h
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qsharedpointer_impl.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/QDateTime \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qdatetime.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/QTime \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/QCoreApplication \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qcoreapplication.h \
+		../../../QTopen/5.9/mingw53_32/include/QtCore/qeventloop.h \
+		../NETDISK/MD5.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\fileactions.o ..\NETDISK\fileactions.cpp
+
+debug/MD5.o: ../NETDISK/MD5.cpp ../NETDISK/MD5.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\MD5.o ..\NETDISK\MD5.cpp
 
 debug/moc_dialog_download.o: debug/moc_dialog_download.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\moc_dialog_download.o debug\moc_dialog_download.cpp

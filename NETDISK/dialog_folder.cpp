@@ -16,7 +16,8 @@ Dialog_folder::~Dialog_folder()
 
 void Dialog_folder::on_myfile_clicked()
 {
-    std::string FileTree=openFile(std::string("C:\\mycloud\\Liu\\usrconfig.conf"),file1.length()+strlen("Liu")+1);
+    std::string FileTree=openFile(std::string("C:\\mycloud\\Liu\\usrconfig.conf"),file1.length()+strlen("Liu")+1,
+                                  SHOWTREE);
     QString show=FileTree.c_str();
     ui->textBrowser->setText(show);
 }
