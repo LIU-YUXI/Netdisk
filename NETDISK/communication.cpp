@@ -38,7 +38,7 @@ string Communication::message_to_string(netdisk_message & msg)
         if(msg.op!=BIND_DIR&&msg.op!=RM_BIND_DIR){
             re+=msg.md5;
             re+="\t";
-            if(msg.op==SEND_FILE||msg.op==SENDCONFIG ){
+            if(msg.op==SEND_FILE||msg.op==SENDCONFIG || msg.op == INITIAL_CLIENT || msg.op == INITIAL_SERVER ){
                 re+=msg.content;
                 re+="\t";
             }
@@ -91,7 +91,7 @@ netdisk_message Communication::string_to_message(string &msg)
                 pos++;
             }
             pos++;
-            if(re.op==SEND_FILE||re.op==SENDCONFIG ){
+            if(re.op==SEND_FILE||re.op==SENDCONFIG  || re.op == INITIAL_CLIENT || re.op == INITIAL_SERVER){
                 while(msg[pos]!='\t'){
                     re.content+=msg[pos];
                     pos++;
@@ -124,7 +124,6 @@ int Communication::send_configmessage(int op,string filename,string content,int 
 // 返回消息号
 int Communication::send_usermessage(int op,string username,string userid,string passwd,int no)
 {
-    qDebug()<<"debug5"<<endl;
     int message_no=no;
     if(no==-1){
         for(int i=1;i<MAXMESSAGE;i++){
@@ -134,7 +133,6 @@ int Communication::send_usermessage(int op,string username,string userid,string 
             }
         }
     }
-    qDebug()<<"debug6"<<endl;
     netdisk_message msg(message_no,op,"",0,"","","",username,userid,passwd,0,0);
     string sendstr=message_to_string(msg);
     netdisk_message msgtemp=string_to_message(sendstr);
