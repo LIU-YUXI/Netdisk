@@ -3,6 +3,7 @@
 #include "dialog_folder.h"
 #include "dialog_regist.h"
 #include "communication.h"
+#include "fileactions.h"
 
 extern Communication com;
 extern netdisk_message msg;
@@ -34,6 +35,9 @@ void netdisk::on_login_clicked()
     else
         ui->show->clear();
     this->close();
+    makesureConfigexist();
+    createFoldersbyFile("C:\\mycloud\\Liu\\usrconfig.conf","C:\\mycloud\\Liu");
+    startMonitor("C:\\mycloud\\Liu\\usrconfig.conf");
     Dialog_folder df;
     df.show();
     df.exec();
