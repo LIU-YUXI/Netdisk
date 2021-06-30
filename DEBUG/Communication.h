@@ -9,8 +9,6 @@
 #include <arpa/inet.h>
 #include <vector>
 #include <queue>
-#include <map>
-#include "readfile.h"
 using namespace std;
 #define myOK 0
 #define myERROR -1
@@ -72,7 +70,7 @@ struct netdisk_message
     {
         ;
     }
-    netdisk_message(int no, int op, string filename, bool is_file, bool is_tail, string path, string md5, string content, string username, string useerid, string passwd, bool user_correct)
+    netdisk_message(int no, int op, string filename, bool is_file, bool is_tail, string path, string md5, string content, string username, string useerid, string passwd, bool user_correct, bool is_tail)
     {
         this->no = no;
         this->op = op;
@@ -114,15 +112,11 @@ public:
     // 发送配置文件
     int send_configmessage(int op, string filename, string content, int no = -1);
     // 發送信息
-    int send_message(int op, string filename, bool is_file, string path = "", string md5 = "", string content = "", int no = -1, bool is_tail = false);
+    int send_message(int op, string filename, bool is_file, string path = "", string md5 = "", string content = "", int no = -1, int tail = false);
     // 发送用户登录、登出、注册信息
     int send_usermessage(int op, string username, string useri, string passwd, bool user_correct, int no = -1);
-    // 空构造
-    Communication();
     // 初始化類類型
     Communication(int connfd);
-    // 复制构造
-    Communication(const Communication &);
     // 斷開鏈接
     int disconnection();
     bool neterror();

@@ -36,7 +36,7 @@ int createFile(int userId, bool isDirectory, string fileName, string md5)
     string fullFileName = getFullFileName(userId, fileName);
     if (isDirectory)
     {
-        if (mkdir(fullFileName, 0755) == -1)
+        if (mkdir(fullFileName.c_str(), 0755) == -1)
         {
             cerr << "mkdir error" << endl;
             return myERROR;
@@ -82,11 +82,6 @@ int renameFile(int userId, string fileName, string newFileName)
 int updateFile(int userId, string fileName, string md5)
 {
     string fullFileName = getFullFileName(userId, fileName);
-    ifstream infile(fullFileName, ios::in);
-    string old_md5;
-    infile >> old_md5;
-    decreaseFileLinks(old_md5);
-    infile.close();
     ofstream outfile(fullFileName, ios::out);
     outfile << md5;
     outfile.close();
