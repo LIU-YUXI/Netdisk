@@ -144,7 +144,7 @@ public:
     int send_cfg();
     // 下列两个函数的msg包括要发送的文件的除完整内容外的所有信息
     // 发送文件
-    int sendfile(netdisk_message msg, string &content);
+    int sendfile(netdisk_message msg);
     // 接收文件，返回已经接收的字节
     int recvfile(netdisk_message msg);
     // 同一客户端其它用户有事件执行，需要同步

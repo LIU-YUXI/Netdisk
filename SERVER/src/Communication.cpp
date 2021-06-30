@@ -70,7 +70,7 @@ string Communication::message_to_string(netdisk_message &msg)
         {
             re += msg.md5;
             re += "\t";
-            if (msg.op == SEND_FILE || msg.op == SENDCONFIG)
+            if (msg.op == SEND_FILE || msg.op == SENDCONFIG) // || msg.op == INITIAL_CLIENT || msg.op == INITIAL_SERVER)
             {
                 re += msg.content;
                 re += "\t";
@@ -133,7 +133,7 @@ netdisk_message Communication::string_to_message(string &msg)
                 pos++;
             }
             pos++;
-            if (re.op == SEND_FILE || re.op == SENDCONFIG)
+            if (re.op == SEND_FILE || re.op == SENDCONFIG) // || re.op == INITIAL_CLIENT || re.op == INITIAL_SERVER)
             {
                 while (msg[pos] != '\t')
                 {
@@ -384,6 +384,7 @@ int Communication::state_next(netdisk_message msg)
                     if (msg.is_file && db.fileExists(msg.md5) == false)
                     { /* 检查文件池里有没有这个文件 */
                         send_message(SURE_GET, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
+                        db.addFile(msg.md5);
                         // 分裂线程开始接收
                         recvfile(msg);
                     }
@@ -392,6 +393,7 @@ int Communication::state_next(netdisk_message msg)
                         if (msg.is_file)
                         {
                             send_message(NOT_GET, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
+                            createFile(this->userid, false, msg.path, msg.md5);
                         }
                         else
                         {
@@ -416,9 +418,7 @@ int Communication::state_next(netdisk_message msg)
             if (msg.op == SURE_GET)
             {
                 file temp = this->initialfiles.front();
-                string content;
-                read(msg.path, content);
-                sendfile(msg, content);
+                sendfile(msg);
                 this->initialfiles.pop();
                 if (!this->initialfiles.empty())
                 {
@@ -444,9 +444,9 @@ int Communication::state_next(netdisk_message msg)
     {
         if (msg.op == SEND_FILE)
         {
+            db.addFile(msg.md5);
             // 分裂线程开始接收
             recvfile(msg);
-            
         }
         else if (msg.op == SEND || msg.op == CHANGE)
         {
@@ -455,6 +455,7 @@ int Communication::state_next(netdisk_message msg)
             if (msg.is_file && db.fileExists(msg.md5) == 0)
             { /* 检查文件池里有没有这个文件 */
                 send_message(SURE_GET, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
+                db.addFile(msg.md5);
                 // 分裂线程开始接收
                 recvfile(msg);
             }
@@ -466,7 +467,6 @@ int Communication::state_next(netdisk_message msg)
                     createFile(this->userid, true, msg.path, "");
                 }
             }
-            
         }
         else if (msg.op == REMOVE)
         {
@@ -563,16 +563,86 @@ int Communication::send_cfg()
 }
 
 // 发送文件
-int Communication::sendfile(netdisk_message msg, string &content)
+int Communication::sendfile(netdisk_message msg)
 {
-    send_message(SEND_FILE,msg.filename,true,msg.path,msg.md5);
-    
+    netdisk_message msgtemp;
+    stringstream ss;
+    ss << this->rootpath << "/" << msg.path;
+    string fullFileName = ss.str();
+    cout << "debug message: in sendfilefunction, fullFileName is " << fullFileName << endl;
+    int orifd = open(fullFileName.c_str(), O_RDONLY);
+    char buffer[1024];
+    read(orifd, buffer, 1024);
+    close(orifd);
+    buffer[32] = '\0';
+    stringstream ss2;
+    ss2 << FILEPOOL << buffer;
+    string realFileName = ss2.str();
+    int realfd = open(realFileName.c_str(), O_RDONLY);
+    int readret = read(realfd, buffer, 1024);
+    while (true)
+    {
+        string content;
+        for (int i = 0; i < readret; ++i)
+        {
+            content += buffer[i];
+        }
+        if (readret == 1024)
+        {
+            send_message(SEND_FILE, msg.filename, true, msg.path, msg.md5, content, msg.no, false);
+            if (recv_message(msgtemp) == myERROR)
+            {
+                /* 写到异常表里 */
+                return myERROR;
+            }
+        }
+        else
+        {
+            send_message(SEND_FILE, msg.filename, true, msg.path, msg.md5, content, msg.no, true);
+            if (recv_message(msgtemp) == myERROR)
+            {
+                /* 写到异常表里 */
+                return myERROR;
+            }
+            break;
+        }
+        readret = read(realfd, buffer, 1024);
+    }
+    close(realfd);
     return myOK;
 }
 // 接收文件，返回已经接收的字节
 int Communication::recvfile(netdisk_message msg)
 {
-
+    cout << "receive" << endl;
+    // 写用户目录下的文件
+    stringstream ss;
+    ss << this->rootpath << "/" << msg.path;
+    string fullFileName = ss.str();
+    cout << fullFileName << endl;
+    ofstream outfile(fullFileName, ios::out);
+    outfile << msg.md5;
+    outfile.close();
+    // 写文件池中的文件
+    stringstream ss2;
+    ss2 << FILEPOOL << msg.md5;
+    string realFileName = ss2.str();
+    ofstream realOutFile(realFileName, ios::out);
+    cout << realFileName << endl;
+    netdisk_message msgtemp;
+    while (true)
+    {
+        cout << "this" << endl;
+        recv_message(msgtemp);
+        send_message(FINISH, msg.filename, msg.is_file);
+        cout << "content: " << msg.content << endl;
+        cout << "content length: " << msg.content.length() << endl;
+        realOutFile << msg.content;
+        if (msgtemp.is_tail)
+            //if (msgtemp.content.length() != 1024)
+            break;
+    }
+    realOutFile.close();
     return myOK;
 }
 

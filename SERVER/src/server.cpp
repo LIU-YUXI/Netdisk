@@ -106,6 +106,7 @@ int main(int argc, char *argv[])
 {
     mkdir(USERFILEDIR, 0777);
     mkdir(USERCONFIGDIR, 0777);
+    mkdir(FILEPOOL, 0777);
     // ÊØ»¤½ø³Ì
     daemon(1, 1);
     uint16_t port;
@@ -150,9 +151,9 @@ int main(int argc, char *argv[])
                          << "connfd is " << connfd << endl
                          << endl;
                     // set non-blocking
-                    int flag = fcntl(connfd, F_GETFL);
-                    flag |= O_NONBLOCK;
-                    fcntl(connfd, F_SETFL, flag);
+                    // int flag = fcntl(connfd, F_GETFL);
+                    // flag |= O_NONBLOCK;
+                    // fcntl(connfd, F_SETFL, flag);
                     // register event
                     event.data.fd = connfd;
                     event.events = EPOLLIN;
