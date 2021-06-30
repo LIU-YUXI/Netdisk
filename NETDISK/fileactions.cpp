@@ -8,11 +8,17 @@
 #include"MD5.h"
 #include<stdio.h>
 #include"communication.h"
-#define logfile "C:\\mycloud\\Liu\\run.log"
+
 // 宽字节字符串转多字节字符串
 using namespace std;
 extern Communication com;
 extern netdisk_message msg;
+extern string clientname;
+extern string uploading_file;
+extern string downloading_file;
+extern string logfile;
+boolean threads[500];
+int thread_pos=0;
 string FileTree;
 
 string retMD5(string filename){
@@ -24,31 +30,38 @@ string retMD5(string filename){
     return md5code;
 }
 
-void sendfile(string filename,string path,string md5){//还没写断点续传
+void sendfile(string filename,string path,string md5,int opt=SEND_FILE,string localpath=""){//还没写断点续传
     string file;
-    ifstream fin(filename.c_str(),ios::binary);//
+    qDebug()<<filename.c_str()<<endl;
+    qDebug()<<localpath.c_str()<<endl;
+    ifstream fin(localpath.c_str(),ios::binary);//
     int count=0;
     char temp_ch;
+    uploading_file=filename;
     while (1)
     {
         if(!fin.get(temp_ch)){
-            com.send_message(SEND_FILE,filename,true,path,md5,file,-1,true);
+            qDebug()<<"content"<<file.c_str()<<endl;
+            com.send_message(opt,filename,true,path,md5,file,-1,true);
             file.clear();
             com.recv_message(msg);
+
             if(msg.op==FINISH)
                 return;
+
         }
         count++;
         file += temp_ch;
         if(count==SENDFILESIZE){
             count=0;
-            com.send_message(SEND_FILE,filename,true,path,md5,file);
+            com.send_message(opt,filename,true,path,md5,file);
             file.clear();
             com.recv_message(msg);
             if(msg.op==FINISH)
                 continue;
         }
     }
+    uploading_file.clear();
 }
 string retFilename(string in){
     if(in.find_last_of("\\")!=in.npos){
@@ -56,10 +69,9 @@ string retFilename(string in){
     }
     return "";
 }
-bool retifisFile(string path){
+boolean retifisFile(string path){
     WIN32_FIND_DATAA fdfile;
     if(FindFirstFileA(path.c_str(), &fdfile)==INVALID_HANDLE_VALUE){
-        qDebug()<<"error"<<endl;
         return false;
     }
     //qDebug()<<"path"<<QString::fromStdString((dir+"\\"+name))<<endl;
@@ -119,7 +131,7 @@ void W2C(wchar_t* pwszSrc, int iSrcLen, char* pszDest, int iDestLen)
         NULL,
         NULL);
 }
-void checkFileschange(string dir,string path) {
+void checkFileschange(string dir,string path,boolean* run) {
     HANDLE dir_handle = CreateFileA(dir.c_str(), FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 
     if (dir_handle == INVALID_HANDLE_VALUE) {
@@ -127,7 +139,7 @@ void checkFileschange(string dir,string path) {
     }
 
     char szTemp[MAX_PATH] = { 0 };
-    BOOL bRet = false;
+    boolean bRet = false;
     DWORD dwRet = 0;
     DWORD dwBufferSize = 2048;
     BYTE* pBuf = new BYTE[dwBufferSize];
@@ -163,6 +175,8 @@ void checkFileschange(string dir,string path) {
         string oldname;
         while (1) {
             // 将宽字符转换成窄字符
+            if(!(*run))
+                break;
             W2C((wchar_t*)(&pFileNotifyInfo->FileName), pFileNotifyInfo->FileNameLength, szTemp, MAX_PATH);
             switch (pFileNotifyInfo->Action)
             {
@@ -171,7 +185,7 @@ void checkFileschange(string dir,string path) {
                 // 新增文件
                 qDebug()<<"[File Added Action]\n"<<QString::fromStdString(GbkToUtf8(szTemp))<<endl;
                 string name=GbkToUtf8(szTemp);
-                bool isfile=retifisFile(dir+"\\"+szTemp);              
+                boolean isfile=retifisFile(dir+"\\"+szTemp);              
                 if (isfile){
                     qDebug()<<"folder"<<endl;
                     com.send_message(SEND,retFilename(szTemp),false,changegang((path+szTemp)),"","");
@@ -208,7 +222,7 @@ void checkFileschange(string dir,string path) {
             case FILE_ACTION_REMOVED:
             {
                 //删除文件
-                bool isfile=retifisFile(dir+"\\"+szTemp);    
+                boolean isfile=retifisFile(dir+"\\"+szTemp);    
                 if(isfile){
                     com.send_message(REMOVE,retFilename(szTemp),true,changegang((path+szTemp)),"","");
                     com.recv_message(msg);
@@ -256,7 +270,7 @@ void checkFileschange(string dir,string path) {
             case FILE_ACTION_RENAMED_NEW_NAME:
             {
                 string name=GbkToUtf8(szTemp);
-                bool isfile=retifisFile(dir+"\\"+szTemp);
+                boolean isfile=retifisFile(dir+"\\"+szTemp);
                 if(isfile){
                     string md5code=retMD5(dir+"\\"+name);
                     qDebug()<<QString::fromStdString(md5code)<<endl;
@@ -294,6 +308,8 @@ void checkFileschange(string dir,string path) {
                 break;
             }
         }
+        if(!(*run))
+            break;
     } while (bRet);
 
     ::CloseHandle(dir_handle);
@@ -301,7 +317,7 @@ void checkFileschange(string dir,string path) {
     pBuf = NULL;
 }
 void openMonitorThread(string dir,string path) {
-    std::thread test1(checkFileschange, dir,path);
+    std::thread test1(checkFileschange, dir,path,&threads[thread_pos]);
     test1.detach();
     writeLog(logfile,"Add monitor thread","success","Start to monitor "+dir);
     Sleep(10);
@@ -309,6 +325,8 @@ void openMonitorThread(string dir,string path) {
 void startMonitor(string file) {
     fstream in;
     in.open(file.c_str(), ios::in);
+    for(int i=0;i<thread_pos;i++)
+        threads[i]=false;
     while (1) {
         char buff[1024] = { 0 };
         in.getline(buff, 1024);
@@ -322,11 +340,15 @@ void startMonitor(string file) {
             path=path.erase(path.find(">"));
             openMonitorThread(line.substr(line.find(">") + 1),path+"\\");
         }
+        threads[thread_pos]=true;
+        thread_pos++;
+        if(thread_pos==500)
+            thread_pos=0;
     }
 
     in.close();
 }
-string findlinkFolder(string in,string path,bool &linked,int length) {
+string findlinkFolder(string in,string path,boolean &linked,int length) {
     linked = false;
     if ((int)path.length() < length)
         return "no";
@@ -340,7 +362,11 @@ string findlinkFolder(string in,string path,bool &linked,int length) {
             return "nothing";
         }
         if (in[pos2] == '\n') {
-            string temp = in.substr(pos1, pos2 - pos1+1);
+            string temp;
+            if(in[pos2-1]=='\r')
+                temp= in.substr(pos1, pos2 - pos1);//xiugai
+            else
+                temp= in.substr(pos1, pos2 - pos1+1);
             qDebug()<<"temp"<<QString::fromStdString(temp)<<endl;
             if (temp.find(folder) != temp.npos) {
                 if (temp.find(">") != temp.npos) {
@@ -358,11 +384,11 @@ string findlinkFolder(string in,string path,bool &linked,int length) {
     }
 
 }
-bool search_folder(const char para[])
+boolean search_folder(const char para[])
 {
     WIN32_FIND_DATAA fdfile;
     HANDLE hFind = FindFirstFileA(para, &fdfile);//第一个参数是路径名，可以使用通配符，fd存储有文件的信息
-    bool done = true;
+    boolean done = true;
     while (1)
     {
         done = FindNextFileA(hFind, &fdfile); //返回的值如果为0则没有文件要寻了
@@ -381,6 +407,7 @@ bool search_folder(const char para[])
 }
 void open_folder(const char para[], int round, int ctrl[],string content,int length,int opt,string path)
 {
+    qDebug()<<"para"<<para<<endl;
     WIN32_FIND_DATAA fdfile;
     HANDLE hFind = FindFirstFileA(para, &fdfile);//第一个参数是路径名，可以使用通配符，fd存储有文件的信息
     if (hFind == INVALID_HANDLE_VALUE)
@@ -396,7 +423,7 @@ void open_folder(const char para[], int round, int ctrl[],string content,int len
         cout << "\n没有子文件夹\n\n";
         return;
     }
-    bool done = true, found_ = search_folder(para);
+    boolean done = true, found_ = search_folder(para);
     if (!found_)
         ctrl[round] = 0;
     int if_is_round1 = 1;
@@ -425,23 +452,25 @@ void open_folder(const char para[], int round, int ctrl[],string content,int len
         FileTree.append(fdfile.cFileName);
         FileTree.append("\n");
         if(opt==CHECKMD5){
-
+            qDebug()<<"sendfile"<<endl;
+            qDebug()<<fdfile.cFileName<<endl;
             string localpath = para;
             localpath = localpath.erase(localpath.find_last_of("\\") + 1);
             string temp=path+fdfile.cFileName;
             string md5code=retMD5(localpath+"\\" + (fdfile.cFileName) );
             com.send_message(INITIAL_CLIENT,fdfile.cFileName,true,changegang(temp),md5code,"");
-            com.recv_message(msg);//还没处理读到消息后的问题
+            com.recv_message(msg);
             if(msg.op==SURE_GET){
-                sendfile(fdfile.cFileName,changegang(temp),md5code);
+                sendfile(fdfile.cFileName,changegang(temp),md5code,INITIAL_CLIENT,localpath+"\\" + (fdfile.cFileName));
                 writeLog(logfile,"Upload a new file","success","Successfully uploaded a file");
             }
             else if(msg.op==NOT_GET){
-                com.send_message(FINISH,fdfile.cFileName,true,changegang(temp),md5code,"");
-                com.recv_message(msg);
-                if(msg.op==FINISH){
+                //sendfile(fdfile.cFileName,changegang(temp),md5code,INITIAL_CLIENT);
+                //com.send_message(FINISH,fdfile.cFileName,true,changegang(temp),md5code,"");
+                //com.recv_message(msg);
+                //if(msg.op==FINISH){
                     writeLog(logfile,"Upload an existed file","success","Successfully uploaded a file");
-                }
+                //}
             }
             else if(msg.op==EXIST){
                 ;
@@ -471,7 +500,7 @@ void open_folder(const char para[], int round, int ctrl[],string content,int len
     HANDLE hfFind = FindFirstFileA(para, &fdfolder);
     while (1)
     {
-        bool done = true;
+        boolean done = true;
         done = FindNextFileA(hfFind, &fdfolder); //返回的值如果为0则没有文件要寻
 
         if (!done)
@@ -492,7 +521,7 @@ void open_folder(const char para[], int round, int ctrl[],string content,int len
         strcat(filename, fdfolder.cFileName);
         WIN32_FIND_DATAA temp;
         HANDLE tempFind = FindFirstFileA(para, &temp);
-        bool final = true;
+        boolean final = true;
         while (1)
         {
             final = FindNextFileA(tempFind, &temp);
@@ -528,13 +557,13 @@ void open_folder(const char para[], int round, int ctrl[],string content,int len
         for (int i = 0; para[i] != '*'; i++)
             adr[i] = para[i];
         strcat(adr, filename);
-        bool islinked;
+        boolean islinked;
         string tempstr=path;
         tempstr+=fdfolder.cFileName;
         if(opt==CHECKMD5){
-            com.send_message(SEND,fdfolder.cFileName,false,changegang(tempstr),"","");
+            com.send_message(INITIAL_CLIENT,fdfolder.cFileName,false,changegang(tempstr),"","");
             com.recv_message(msg);
-            if(msg.op==FINISH){
+            if(msg.op==FINISH||msg.op==EXIST){
                 writeLog(logfile,"Upload a folder","succesee","Successfully uploaded a folder");
             }
         }
@@ -573,13 +602,13 @@ string openFile(string filename,int length,int opt) {
         content.insert(content.length(),1,(char)in.get());
     qDebug()<<QString::fromStdString(content)<<endl;
     in.close();
-    FileTree.append("Liu-root\n");
+    FileTree.append(clientname+"-root\n");
     //open_folder("D:\\linux_beta\\*.*",1,ctrl,content,100);
-    open_folder("C:\\mycloud\\Liu\\Liu-root\\*.*",1, ctrl, content,length,opt,"");
+    open_folder(("C:\\mycloud\\"+clientname+"\\"+clientname+"-root\\*.*").c_str(),1, ctrl, content,length,opt,"");
     return GbkToUtf8(FileTree.c_str());
 }
 
-bool addDir(string filename,string dirname,string clientusrname) {
+boolean addDir(string filename,string dirname,string clientusrname) {
     fstream out;
     out.open(filename, ios::out | ios::app |ios::in);
     while (1) {
@@ -604,10 +633,22 @@ bool addDir(string filename,string dirname,string clientusrname) {
     path.append("\\");
     MakeSureDirectoryPathExists(path.c_str());
     out.close();
+    startMonitor(filename);
+
+    sendfile("usrconfig.conf","","",SENDCONFIG);
+    com.recv_message(msg);
+    if(msg.op!=FINISH)
+        return false;
+    com.send_message(SEND,dirname.substr(dirname.find_last_not_of("\\")+1)
+                     ,false,dirname.substr(dirname.find("\\")+1),"","");
+    com.recv_message(msg);
+    if(msg.op!=FINISH)
+        return false;
+
     writeLog(logfile,"Add cloud path","success","Successfully added a cloud path");
     return true;
 }
-bool bondDir(string filename,string dir1,string dir2) {
+boolean bondDir(string filename,string dir1,string dir2) {
 
     WIN32_FIND_DATAA fdfile;
     HANDLE hFind = FindFirstFileA((dir2+"\\*.*").c_str(), &fdfile);
@@ -624,7 +665,7 @@ bool bondDir(string filename,string dir1,string dir2) {
             level++;
     }
     file.seekg(0, ios::beg);
-    bool found=false;
+    boolean found=false;
     while (1) {
         char buff[1024] = { 0 };
         file.getline(buff, 1024);
@@ -632,7 +673,7 @@ bool bondDir(string filename,string dir1,string dir2) {
             break;
 
         int cur_level = 0;
-        bool bonded = false;
+        boolean bonded = false;
         int i = 0;
         for (i = 0; buff[i] != '\0'; i++) {
             if (buff[i] == '\\')
@@ -695,10 +736,15 @@ bool bondDir(string filename,string dir1,string dir2) {
     //cout <<  content << endl;
     file << content;
     file.close();
+    startMonitor(filename);
+    sendfile("usrconfig.conf","","",SENDCONFIG);
+    com.recv_message(msg);
+    if(msg.op!=FINISH)
+        return false;
     writeLog(logfile,"Bond cloud path","success","Successfully bond "+dir2+" to "+dir1);
     return true;
 }
-bool deleteDir(string filename, string dirname,string clientusrname) {//可以优化 是否删除目录下的全部文件
+boolean deleteDir(string filename, string dirname,string clientusrname) {//可以优化 是否删除目录下的全部文件
     fstream out;
     out.open(filename, ios::out | ios::app | ios::in);
     int level = 0;
@@ -707,7 +753,7 @@ bool deleteDir(string filename, string dirname,string clientusrname) {//可以�
             level++;
     }
     string content;
-    bool found=false;
+    boolean found=false;
     while (1) {
         char buff[1024] = { 0 };
         out.getline(buff, 1024);
@@ -754,10 +800,20 @@ bool deleteDir(string filename, string dirname,string clientusrname) {//可以�
     out.open(filename.c_str(), ios::out | ios::trunc);
     out << content;
     out.close();
+    startMonitor(filename);
+    sendfile("usrconfig.conf","","",SENDCONFIG);
+    com.recv_message(msg);
+    if(msg.op!=FINISH)
+        return false;
+    com.send_message(REMOVE,dirname.substr(dirname.find_last_not_of("\\")+1)
+                     ,false,dirname.substr(dirname.find("\\")+1),"","");
+    com.recv_message(msg);
+    if(msg.op!=FINISH)
+        return false;
     writeLog(logfile,"Delete cloud path","success","Successfully deleted a cloud path");
     return true;
 }
-bool unbondDir(string filename, string dirname) {
+boolean unbondDir(string filename, string dirname) {
     fstream out;
     out.open(filename, ios::out | ios::app | ios::in);
     int level = 0;
@@ -766,7 +822,7 @@ bool unbondDir(string filename, string dirname) {
             level++;
     }
     string content;
-    bool found = false;
+    boolean found = false;
     while (1) {
         char buff[1024] = { 0 };
         out.getline(buff, 1024);
@@ -774,7 +830,7 @@ bool unbondDir(string filename, string dirname) {
             break;
 
         int cur_level = 0;
-        //bool bonded = false;
+        //boolean bonded = false;
         int i = 0;
         for (i = 0; buff[i] != '\0'; i++) {
             if (buff[i] == '\\')
@@ -808,6 +864,11 @@ bool unbondDir(string filename, string dirname) {
     out.open(filename.c_str(), ios::out | ios::trunc);
     out << content;
     out.close();
+    startMonitor(filename);
+    sendfile("usrconfig.conf","","",SENDCONFIG);
+    com.recv_message(msg);
+    if(msg.op!=FINISH)
+        return false;
     writeLog(logfile,"Unbond cloud path","success","Successfully unbonded a cloud path");
     return true;
 }
@@ -833,8 +894,8 @@ void createFoldersbyFile(string filename,string dir) {
     writeLog(logfile,"Create folders","success","Successfully created folders");
     file.close();
 }
-void makesureConfigexist() {
-    string clientusrname = "Liu";//到时候根据登录名进行修改
+string makesureConfigexist() {
+    string clientusrname = clientname;//到时候根据登录名进行修改
     char winusrname[256] = { 0 };
     DWORD dwSize = 256;
     GetUserNameA(winusrname, &dwSize);
@@ -844,6 +905,7 @@ void makesureConfigexist() {
     file += file2;
     fstream in;
     in.open(file.c_str());
+    string md5code;
     if (in) {
         //createFoldersbyFile(file, file1 + "fyl06" + file2 + clientusrname);
         //bondDir(file,clientusrname + "-root\\folderB", "D:\\linux_beta");
@@ -851,6 +913,7 @@ void makesureConfigexist() {
         //cout<<deleteDir(file, "Liu-root\\folderA", clientusrname);
         //cout << unbondDir(file, clientusrname + "-root\\folderA");
         in.close();
+        return retMD5(file);
     }//配置文件存在，可以读取绑定目录
     else {
         string path;
@@ -873,17 +936,80 @@ void makesureConfigexist() {
 
         out.close();
 
-
+        return retMD5(file);
 
     }//进行目录绑定
-    return ;
+    return "";
 }
 
 void mysleep(int period){
     QTime t;
     t.start();
-    while(t.elapsed()<period*100){
+    while(t.elapsed()<period*1000){
         QCoreApplication::processEvents();
     }
 }
 
+string retLocalpath(string path,string filename){
+    ifstream in;
+    in.open((file1+clientname+file2).c_str(),ios::in);
+    while (1) {
+        char buff[1024] = { 0 };
+        in.getline(buff, 1024);
+        if (!in.good())
+            break;
+        string line=buff;
+        if(line.find(">")!=line.npos){
+            string withoutroot=line.substr(line.find_first_of("\\")+1);
+            withoutroot.erase(withoutroot.find(">"));
+            if(path.find(withoutroot)!=path.npos){
+                string ret;
+                ret=line.substr((line.find(">")+1));
+                ret+="\\";
+                ret+=path.substr(path.find("\\")+1);
+                ret+="\\";
+                ret+=filename;
+                in.close();
+                return ret;
+            }
+        }
+    }
+    return "";
+}
+
+void receiveFiles(){
+    while(1){
+        com.recv_message(msg);
+        string path=retLocalpath(msg.path,msg.filename);
+        if(msg.op==FINISH_INITIAL){
+            break;
+        }
+        if(msg.is_file){
+            WIN32_FIND_DATAA fdfile;
+            if(FindFirstFileA(path.c_str(), &fdfile)==INVALID_HANDLE_VALUE){//不存在
+                ofstream out;
+                out.open(path.c_str(),ios::out);
+                downloading_file=msg.filename;
+                while(1){
+                    com.send_message(SURE_GET,msg.filename,true,msg.path,"","");
+                    com.recv_message(msg);
+                    out<<msg.content;
+                    if(msg.is_tail)
+                        break;
+
+                }
+                out.close();
+                downloading_file.clear();
+            }
+            else
+                com.send_message(EXIST,msg.filename,true,msg.path,"","");
+        }
+        else{
+            MakeSureDirectoryPathExists((path+"\\").c_str());
+            com.send_message(EXIST,msg.filename,true,msg.path,"","");
+        }
+        //存在返回exist
+        //不存在返回sure
+        
+    }
+}

@@ -193,7 +193,6 @@ Makefile: ../NETDISK/NETDISK.pro ../../../QTopen/5.9/mingw53_32/mkspecs/win32-g+
 		../../../QTopen/5.9/mingw53_32/mkspecs/features/qt_config.prf \
 		../../../QTopen/5.9/mingw53_32/mkspecs/win32-g++/qmake.conf \
 		../../../QTopen/5.9/mingw53_32/mkspecs/features/spec_post.prf \
-		.qmake.stash \
 		../../../QTopen/5.9/mingw53_32/mkspecs/features/exclusive_builds.prf \
 		../../../QTopen/5.9/mingw53_32/mkspecs/features/toolchain.prf \
 		../../../QTopen/5.9/mingw53_32/mkspecs/features/default_pre.prf \
@@ -353,7 +352,6 @@ Makefile: ../NETDISK/NETDISK.pro ../../../QTopen/5.9/mingw53_32/mkspecs/win32-g+
 ../../../QTopen/5.9/mingw53_32/mkspecs/features/qt_config.prf:
 ../../../QTopen/5.9/mingw53_32/mkspecs/win32-g++/qmake.conf:
 ../../../QTopen/5.9/mingw53_32/mkspecs/features/spec_post.prf:
-.qmake.stash:
 ../../../QTopen/5.9/mingw53_32/mkspecs/features/exclusive_builds.prf:
 ../../../QTopen/5.9/mingw53_32/mkspecs/features/toolchain.prf:
 ../../../QTopen/5.9/mingw53_32/mkspecs/features/default_pre.prf:

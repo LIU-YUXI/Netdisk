@@ -6,6 +6,8 @@
 #include <string>
 #include <winsock2.h>
 #include<QDebug>
+#include<fstream>
+#include<errno.h>
 using namespace std;
 
 #define myOK 0
@@ -51,8 +53,8 @@ using namespace std;
 struct netdisk_message{
     int no; // 事件编号，用来确认是不是完成了,或者确认要不要真正传输文件,1bit
     int op; // 操作码 1bit
-    bool is_tail; // 是不是传输文件的最后一个部分
-    bool is_file; // true表示是文件
+    boolean is_tail; // 是不是传输文件的最后一个部分
+    boolean is_file; // true表示是文件
     string md5; // md5码
     string path; // 路径（不包括文件名
     string filename; // 文件名
@@ -60,11 +62,11 @@ struct netdisk_message{
     string username;
     string userid;
     string passwd;
-    bool user_correct;
+    boolean user_correct;
     netdisk_message(){
         ;
     }
-    netdisk_message(int no,int op,string filename,bool is_file,string path,string md5,string content,string username,string userid,string passwd,bool user_correct,bool is_tail){
+    netdisk_message(int no,int op,string filename,boolean is_file,string path,string md5,string content,string username,string userid,string passwd,boolean user_correct,boolean is_tail){
         this->no=no;
         this->op=op;
         this->filename=filename;
@@ -83,20 +85,21 @@ struct netdisk_message{
 // 负责联网和通信，使用 Communication(string ip,string port); 初始化，然后调用connect连接
 class Communication {
 private:
-    bool message_count_use[MAXMESSAGE]; //标记该消息号是否用过
+    boolean message_count_use[MAXMESSAGE]; //标记该消息号是否用过
     string ip;
     int port;
-    bool ConnectError;
-    SOCKET sclient;
+    boolean ConnectError;
+
     string message_to_string(netdisk_message & msg);
     netdisk_message string_to_message(string &msg);
 public:
+    SOCKET sclient;//pritvate
     // 與服務端鏈接是否錯誤
-    bool connecterror();
+    boolean connecterror();
     // 发送配置文件
     int send_configmessage(int op,string filename,string content,int no=-1);
     // 發送信息
-    int send_message(int op,string filename,bool is_file,string path="",string md5="",string content="",int no=-1,bool is_tail=false);
+    int send_message(int op,string filename,boolean is_file,string path="",string md5="",string content="",int no=-1,boolean is_tail=false);
     // 发送用户登录、登出、注册信息
     int send_usermessage(int op,string username,string useri,string passwd,int no=-1);   
     // 初始化類類型，调用完请接着调用connect函数来连接服务器
@@ -112,3 +115,4 @@ public:
     int REconnection();
     
 };
+void print(netdisk_message& msg);
