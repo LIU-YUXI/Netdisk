@@ -444,7 +444,9 @@ int Communication::state_next(netdisk_message msg)
     {
         if (msg.op == SEND_FILE)
         {
+            // 分裂线程开始接收
             recvfile(msg);
+            
         }
         else if (msg.op == SEND || msg.op == CHANGE)
         {
@@ -464,6 +466,7 @@ int Communication::state_next(netdisk_message msg)
                     createFile(this->userid, true, msg.path, "");
                 }
             }
+            
         }
         else if (msg.op == REMOVE)
         {
@@ -559,11 +562,11 @@ int Communication::send_cfg()
     return msgno;
 }
 
-// 如果同一用户的另一端有文件更改，该端直接调用这个函数发送
 // 发送文件
 int Communication::sendfile(netdisk_message msg, string &content)
 {
-
+    send_message(SEND_FILE,msg.filename,true,msg.path,msg.md5);
+    
     return myOK;
 }
 // 接收文件，返回已经接收的字节
