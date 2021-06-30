@@ -1,5 +1,5 @@
-#include "./crud.h"
-#include "../database/Database.h"
+#include "../include/crud.h"
+#include "../include/Database.h"
 // 以下fileName全部指代从用户根目录开始的路径，并且包括文件名，如果目录则包括目录名，最后没有斜杠
 // 如，.../users/1/homework.pdf，则userId为1，fileName为homework.pdf;
 // 如，.../users/1/sports/images/swimming.jpg，则userId为1，fileName为sports/images/swimming.jpg;
@@ -47,7 +47,6 @@ int createFile(int userId, bool isDirectory, string fileName, string md5)
         ofstream outfile(fullFileName, ios::out);
         outfile << md5;
         outfile.close();
-        
     }
     return 0;
 }
@@ -63,15 +62,16 @@ int deleteFile(int userId, string fileName)
 
 int renameFile(int userId, string fileName, string newFileName)
 {
-    int i=0;
-    for(i=fileName.length()-1;i>=0;i--){
-        if(fileName[i]=='/')
+    int i = 0;
+    for (i = fileName.length() - 1; i >= 0; i--)
+    {
+        if (fileName[i] == '/')
             break;
     }
-    string fullnewpath=fileName;
-    fullnewpath.resize(i+1);
-    fullnewpath+=newFileName;
-    newFileName=fullnewpath;
+    string fullnewpath = fileName;
+    fullnewpath.resize(i + 1);
+    fullnewpath += newFileName;
+    newFileName = fullnewpath;
     string fullFileName = getFullFileName(userId, fileName);
     if (rename(fullFileName.c_str(), newFileName.c_str()) == 0)
         return myOK;
