@@ -95,7 +95,7 @@ private:
     netdisk_message string_to_message(string &msg);
 public:
     // 用户id
-    string userid;
+    int userid;
     string configname;
     string rootpath;
     // 與服務端鏈接是否錯誤
