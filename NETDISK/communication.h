@@ -64,7 +64,7 @@ struct netdisk_message{
     netdisk_message(){
         ;
     }
-    netdisk_message(int no,int op,string filename,bool is_file,string path,string md5,string content,string username,string userid,string passwd,bool user_correct){
+    netdisk_message(int no,int op,string filename,bool is_file,string path,string md5,string content,string username,string userid,string passwd,bool user_correct,bool is_tail){
         this->no=no;
         this->op=op;
         this->filename=filename;
@@ -95,7 +95,7 @@ public:
     // 发送配置文件
     int send_configmessage(int op,string filename,string content,int no=-1);
     // 發送信息
-    int send_message(int op,string filename,bool is_file,string path="",string md5="",string content="",int no=-1);
+    int send_message(int op,string filename,bool is_file,string path="",string md5="",string content="",int no=-1,bool is_tail=false);
     // 发送用户登录、登出、注册信息
     int send_usermessage(int op,string username,string useri,string passwd,int no=-1);   
     // 初始化類類型，调用完请接着调用connect函数来连接服务器

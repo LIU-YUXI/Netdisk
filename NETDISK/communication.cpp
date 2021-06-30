@@ -14,6 +14,7 @@ string Communication::message_to_string(netdisk_message & msg)
         re+='\t';
     }
     else if(msg.op!=SURE_GET&&msg.op!=NOT_GET){
+        re+=(char)(msg.is_tail+1);
         re+=(char)(msg.is_file+1);
         re+=msg.filename;
         re+="\t";
@@ -56,6 +57,7 @@ netdisk_message Communication::string_to_message(string &msg)
         }
     }
     else if(re.op!=SURE_GET&&re.op!=NOT_GET){
+        re.is_tail=(msg[flagtail_begin]-1);
         re.is_file=(msg[flagfile_begin]-1);
         int pos=flagfile_begin+1;
         while(msg[pos]!='\t'){
@@ -94,7 +96,7 @@ int Communication::send_configmessage(int op,string filename,string content,int 
             }
         }
     }
-    netdisk_message msg(message_no,op,filename,0,"","",content,"","","",0);
+    netdisk_message msg(message_no,op,filename,0,"","",content,"","","",0,0);
     string sendstr=message_to_string(msg);
     if(send(sclient,sendstr.c_str(),sendstr.length(),0)<=0){
         cout<<"fail to send message, please check the network"<<endl;
@@ -116,7 +118,7 @@ int Communication::send_usermessage(int op,string username,string userid,string 
             }
         }
     }
-    netdisk_message msg(message_no,op,"",0,"","","",username,userid,passwd,0);
+    netdisk_message msg(message_no,op,"",0,"","","",username,userid,passwd,0,0);
     string sendstr=message_to_string(msg);
     if(send(sclient,sendstr.c_str(),sendstr.length(),0)<=0){
         cout<<"fail to send message, please check the network"<<endl;
@@ -127,7 +129,7 @@ int Communication::send_usermessage(int op,string username,string userid,string 
     return message_no;
 }
 // 返回消息号
-int Communication::send_message(int op,string filename,bool is_file,string path,string md5,string content,int no)
+int Communication::send_message(int op,string filename,bool is_file,string path,string md5,string content,int no,bool is_tail)
 {
     int message_no=no;
     if(no==-1){
@@ -138,7 +140,7 @@ int Communication::send_message(int op,string filename,bool is_file,string path,
             }
         }
     }
-    netdisk_message msg(message_no,op,filename,is_file,path,md5,content,"","","",0);
+    netdisk_message msg(message_no,op,filename,is_file,path,md5,content,"","","",0,is_tail);
     string sendstr=message_to_string(msg);
     if(send(sclient,sendstr.c_str(),sendstr.length(),0)<=0){
         cout<<"fail to send message, please check the network"<<endl;

@@ -1,5 +1,8 @@
 #include "./readfile.h"
 #include "./communication.h"
+#include "../database/Database.h"
+#include "./crud.h"
+
 string Communication::message_to_string(netdisk_message & msg)
 {
     string re;
@@ -241,10 +244,10 @@ int Communication::state_next(netdisk_message msg){
         }
         else{
             if(msg.op==INITIAL_CLIENT){
-                int re=/* 检查文件是否存在 */;
+                int re=sameNameFile(this->userid,msg.path,msg.md5)/* 检查文件是否存在 */;
                 if(re==0||re==2){
                     string filename=(re==0?msg.filename:msg.filename+"-crash"); // 冲突
-                    if(/* 检查文件池里有没有这个文件 */==0){
+                    if(fileExists(msg.md5)==false){/* 检查文件池里有没有这个文件 */
                         send_message(SURE_GET,msg.filename,msg.is_file,msg.is_tail,msg.md5,msg.content,msg.no);
                         // 分裂线程开始接收
                         recvfile(msg);
@@ -269,20 +272,58 @@ int Communication::state_next(netdisk_message msg){
         // 先接收上一次的结果，再发送下一次的
         else{
             if(!this->initialfiles.empty()){
-                file temp=this->initialfiles.front();
                 if(msg.op==SURE_GET){
+                    file temp=this->initialfiles.front();
                     string content;
-                    read()
-                    sendfile(msg,)
+                    read(msg.path,content);
+                    sendfile(msg,content);
+                    this->initialfiles.pop();
+                    if(!this->initialfiles.empty()){
+                        temp=this->initialfiles.front();
+                        // 询问是否要发
+                        send_message(INITIAL_SERVER,temp.filename,temp.is_file,temp.path,temp.md5,"");
+                    }
+                    else{
+                        this->STATE=PROCSEXCP;
+                    }
                 }
-                // 询问是否要发
-                send_message(INITIAL_SERVER,temp,temp.is_file,temp.path,temp.md5,"");
-
             }
         }
     }
     else if(this->STATE==PROCSEXCP){
         this->STATE=NORMAL;
+    }
+    // 正常状态
+    else{
+        if(msg.op==SURE_SEND||msg.op==CHANGE){
+            recvfile(msg);
+        }
+        else if(msg.op==SEND){
+            int re=sameNameFile(this->userid,msg.filename,msg.md5);/* 检查文件是否存在 */
+            string filename=(re==0?msg.filename:msg.filename+"-crash"); // 冲突
+            if(fileExists(msg.md5)==0){/* 检查文件池里有没有这个文件 */
+                send_message(SURE_GET,msg.filename,msg.is_file,msg.is_tail,msg.md5,msg.content,msg.no);
+                // 分裂线程开始接收
+                recvfile(msg);
+            }
+            else{
+                send_message(NOT_GET,msg.filename,msg.is_file,msg.is_tail,msg.md5,msg.content,msg.no);
+            }
+        }
+        else if(msg.op==REMOVE){
+            delete
+            send_message(FINISH,msg.filename,msg.is_file,"","","",msg.no);
+        }
+        else if(msg.op==RENAME){
+
+            send_message(FINISH,msg.filename,msg.is_file,"","","",msg.no);
+        }
+        else if(msg.op==BIND_DIR){
+
+        }
+        else if(msg.op==RM_BIND_DIR){
+
+        }
     }
 }
 
@@ -293,12 +334,13 @@ int Communication::state_rst(){
 int Communication::procs_login(netdisk_message msg){
     if(msg.op!=LOGIN)
         return myERROR;
-    if(/* 查询账号密码 获得用户名*/<0){
+    int dbuserid;
+    if(loginUser(dbuserid,msg.username,msg.userid,msg.passwd)==myERROR){
         send_usermessage(LOGIN,msg.username,msg.userid,msg.passwd,false,msg.no);
         return myERROR;
     }
-    this->userid=msg.userid;
-    this->configname="./"+msg.userid+"/"+"dir.cfg";
+    this->userid=dbuserid;
+    this->configname="./"+dbuserid+"/"+"dir.cfg";
     if(send_usermessage(FINISH,msg.username,msg.userid,msg.passwd,true,msg.no)<0)
         return myERROR;
     return myOK;
@@ -313,6 +355,8 @@ int Communication::send_cfg(){
     return msgno;
 }
 
+
+// 如果同一用户的另一端有文件更改，该端直接调用这个函数发送
 // 发送文件
 int sendfile(netdisk_message msg,string &content){
     
