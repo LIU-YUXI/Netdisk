@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     netdisk w;
-    //com.connection();
+    com.connection();
     w.show();
     return a.exec();
 }

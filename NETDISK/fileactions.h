@@ -5,6 +5,7 @@
 #define _CRT_NON_CONFORMING_SWPRINTFS
 #define _CRT_SECURE_NO_WARNINGS
 #include<iostream>
+#include<winsock2.h>
 #include<Windows.h>
 #include<cstdlib>
 #include<thread>
@@ -16,6 +17,8 @@
 #include<cstring>
 #include<direct.h>
 #include <ImageHlp.h>
+#define CHECKMD5 1
+#define SHOWTREE 0
 using namespace std;
 const string file1 = "C:\\mycloud\\";
 const string file2 = "\\usrconfig.conf";
@@ -24,7 +27,7 @@ const string path1 = "C:\\mycloud\\";
 const string path2 = "\\";
 
 void startMonitor(string file);
-string openFile(string filename,int length);
+string openFile(string filename,int length,int opt);
 void makesureConfigexist();
 void createFoldersbyFile(string filename,string dir);
 bool addDir(string filename,string dirname,string clientusrname);

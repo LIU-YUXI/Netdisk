@@ -5,11 +5,43 @@
 #include<QDateTime>
 #include<QTime>
 #include<QCoreApplication>
+#include"MD5.h"
+#include"communication.h"
 #define logfile "C:\\mycloud\\Liu\\run.log"
 // 宽字节字符串转多字节字符串
 using namespace std;
-
+extern Communication com;
+extern netdisk_message msg;
 string FileTree;
+
+void sendfile(string filename,string path,string md5){//还没写断点续传
+    string file;
+    ifstream fin(filename.c_str(),ios::binary);//
+    int count=0;
+    char temp_ch;
+    while (1)
+    {
+        if(!fin.get(temp_ch)){
+            com.send_message(SEND_FILE,filename,true,path,md5,file,-1,true);
+            file.clear();
+            com.recv_message(msg);
+            if(msg.op==FINISH)
+                return;
+        }
+        count++;
+        file += temp_ch;
+        if(count==1024){
+            count=0;
+            com.send_message(SEND_FILE,filename,true,path,md5,file);
+            file.clear();
+            com.recv_message(msg);
+            if(msg.op==FINISH)
+                continue;
+        }
+    }
+}
+
+
 string GbkToUtf8(const char *src_str)
 {
     int len = MultiByteToWideChar(CP_ACP, 0, src_str, -1, NULL, 0);
@@ -23,6 +55,15 @@ string GbkToUtf8(const char *src_str)
     if (wstr) delete[] wstr;
     if (str) delete[] str;
     return strTemp;
+}
+string changegang(const string in){
+    string send=in;
+    for(int i=0;i<(int)in.length();i++)
+    {
+        if(send[i]=='\\')
+            send[i]='/';
+    }
+    return send;
 }
 
 void writeLog(string file,string operation,string status,string content){
@@ -225,7 +266,7 @@ bool search_folder(const char para[])
     FindClose(hFind);
     return false;
 }
-void open_folder(const char para[], int round, int ctrl[],string content,int length)
+void open_folder(const char para[], int round, int ctrl[],string content,int length,int opt,string path)
 {
     WIN32_FIND_DATAA fdfile;
     HANDLE hFind = FindFirstFileA(para, &fdfile);//第一个参数是路径名，可以使用通配符，fd存储有文件的信息
@@ -270,6 +311,30 @@ void open_folder(const char para[], int round, int ctrl[],string content,int len
         }
         FileTree.append(fdfile.cFileName);
         FileTree.append("\n");
+        if(opt==CHECKMD5){
+            ifstream in;
+            in.open((fdfile.cFileName),ios::in);
+            MD5 m(in);
+            string md5code=m.toString();
+            in.close();
+            string temp=path+fdfile.cFileName;
+            com.send_message(INITIAL_CLIENT,fdfile.cFileName,true,changegang(temp),md5code,"");
+            com.recv_message(msg);//还没处理读到消息后的问题
+            if(msg.op==SURE_GET){
+                sendfile(fdfile.cFileName,changegang(temp),md5code);
+                writeLog(logfile,"Upload a new file","success","Successfully uploaded a file");
+            }
+            else if(msg.op==NOT_GET){
+                com.send_message(FINISH,fdfile.cFileName,true,changegang(temp),md5code,"");
+                com.recv_message(msg);
+                if(msg.op==FINISH){
+                    writeLog(logfile,"Upload an existed file","success","Successfully uploaded a file");
+                }
+            }
+            else if(msg.op==EXIST){
+                ;
+            }
+        }
         if (!done)
         {
             FileTree.append("\n");
@@ -352,19 +417,29 @@ void open_folder(const char para[], int round, int ctrl[],string content,int len
             adr[i] = para[i];
         strcat(adr, filename);
         bool islinked;
+        string tempstr=path;
+        tempstr+=fdfolder.cFileName;
+        if(opt==CHECKMD5){
+            com.send_message(SEND,fdfolder.cFileName,false,changegang(tempstr),"","");
+            com.recv_message(msg);
+            if(msg.op==FINISH){
+                writeLog(logfile,"Upload a folder","succesee","Successfully uploaded a folder");
+            }
+        }
+
         strcat(adr, "\\*.*");
 
         string a=findlinkFolder(content, adr, islinked, length);
         qDebug()<<islinked<<endl;
         if (islinked) {
-            qDebug()<<QString::fromStdString(a)<<endl;
+            //qDebug()<<QString::fromStdString(a)<<endl;
             memset(adr, 0, 260);
             a.erase(a.length() - 1);
             strcat(adr,a.c_str());
             strcat(adr, "\\*.*");
         }
-        qDebug()<<"adr"<<adr<<endl;
-        open_folder(adr, round + 1, ctrl,content,length);
+        //qDebug()<<"adr"<<adr<<endl;
+        open_folder(adr, round + 1, ctrl,content,length,opt,tempstr+="\\");
         if (!done)
         {
             FindClose(hfFind);
@@ -373,7 +448,8 @@ void open_folder(const char para[], int round, int ctrl[],string content,int len
         }
     }
 }
-string openFile(string filename,int length) {
+
+string openFile(string filename,int length,int opt) {
     //从文件中拿到名字，如果没有箭头表示没有被绑定
     //否则表示被绑定，替换为后面的内容，调用open_folder
     FileTree.clear();
@@ -387,7 +463,7 @@ string openFile(string filename,int length) {
     in.close();
     FileTree.append("Liu-root\n");
     //open_folder("D:\\linux_beta\\*.*",1,ctrl,content,100);
-    open_folder("C:\\mycloud\\Liu\\Liu-root\\*.*",1, ctrl, content,length);
+    open_folder("C:\\mycloud\\Liu\\Liu-root\\*.*",1, ctrl, content,length,opt,"");
     return GbkToUtf8(FileTree.c_str());
 }
 

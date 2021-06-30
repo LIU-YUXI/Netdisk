@@ -6,6 +6,7 @@ INPUT(
 ./debug\main.o
 ./debug\netdisk.o
 ./debug\fileactions.o
+./debug\MD5.o
 ./debug\moc_dialog_download.o
 ./debug\moc_dialog_folder.o
 ./debug\moc_dialog_regist.o

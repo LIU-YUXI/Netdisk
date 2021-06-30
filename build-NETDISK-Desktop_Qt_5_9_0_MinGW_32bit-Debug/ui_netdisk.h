@@ -51,7 +51,7 @@ public:
         centralwidget->setObjectName(QStringLiteral("centralwidget"));
         title = new QLabel(centralwidget);
         title->setObjectName(QStringLiteral("title"));
-        title->setGeometry(QRect(370, 200, 111, 61));
+        title->setGeometry(QRect(370, 200, 141, 61));
         QFont font1;
         font1.setFamily(QStringLiteral("Arial"));
         font1.setPointSize(20);
