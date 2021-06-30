@@ -26,16 +26,11 @@ netdisk::~netdisk()
 
 void netdisk::on_login_clicked()
 {
-    qDebug()<<"debug1"<<endl;
     com.send_usermessage(LOGIN,ui->username->toPlainText().toStdString(),
                                    ui->username->toPlainText().toStdString(),
                                    ui->password->toPlainText().toStdString());
-    qDebug()<<"debug2"<<endl;
-    Sleep(5000);
     netdisk_message msg;
     com.recv_message(msg);
-    qDebug()<<"debug3"<<endl;
-    Sleep(5000);
     boolean temp=msg.user_correct;
     qDebug()<<temp<<endl;
     if(temp==false){
@@ -52,7 +47,6 @@ void netdisk::on_login_clicked()
     qDebug()<<"debug1"<<endl;
     if(msg.op==SENDCONFIG){
         qDebug()<<"receive"<<endl;
-        Sleep(1000000);
         ofstream out;
         downloading_file="usrconfig.conf";
         out.open("C:\\mycloud\\"+clientname+"\\usrconfig.conf",ios::out);
