@@ -1,3 +1,3 @@
-#define USERFILEDIR "/home/u1952640/NETDISK/Users/"
-#define USERCONFIGDIR "/home/u1952640/NETDISK/Usersconfig/"
-#define FILEPOOL "/home/u1952640/NETDISK/Filepool/"
+#define USERFILEDIR "/home/G1951247/NETDISK/Users/"
+#define USERCONFIGDIR "/home/G1951247/NETDISK/Usersconfig/"
+#define FILEPOOL "/home/G1951247/NETDISK/Filepool/"

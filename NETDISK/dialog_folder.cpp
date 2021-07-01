@@ -2,10 +2,6 @@
 #include "ui_dialog_folder.h"
 #include"fileactions.h"
 #include <QDebug>
-extern string clientname;
-extern string downloading_file;
-extern string uploading_file;
-
 Dialog_folder::Dialog_folder(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog_folder)
@@ -20,8 +16,7 @@ Dialog_folder::~Dialog_folder()
 
 void Dialog_folder::on_myfile_clicked()
 {
-    std::string FileTree=openFile("C:\\mycloud\\"+clientname+"\\usrconfig.conf",
-                                              file1.length()+clientname.length()+1,SHOWTREE);
+    std::string FileTree=openFile(std::string("C:\\mycloud\\Liu\\usrconfig.conf"),file1.length()+strlen("Liu")+1);
     QString show=FileTree.c_str();
     ui->textBrowser->setText(show);
 }
@@ -29,7 +24,7 @@ void Dialog_folder::on_myfile_clicked()
 void Dialog_folder::on_link_clicked()
 {
     ui->cloudpath->setDisabled(false);
-    ui->cloudpath->setPlainText(QString::fromStdString(clientname)+"-root\\");
+    ui->cloudpath->setPlainText("cloudpath");
     ui->localpath->setDisabled(false);
     ui->localpath->setPlainText("localpath");
 
@@ -40,7 +35,7 @@ void Dialog_folder::on_link_clicked()
 void Dialog_folder::on_unlink_clicked()
 {
     ui->cloudpath->setDisabled(false);
-    ui->cloudpath->setPlainText(QString::fromStdString(clientname)+"-root\\");
+    ui->cloudpath->setPlainText("cloudpath");
     ui->localpath->setDisabled(true);
 
     ui->confirm->setDisabled(false);
@@ -50,7 +45,7 @@ void Dialog_folder::on_unlink_clicked()
 void Dialog_folder::on_addpath_clicked()
 {
     ui->cloudpath->setDisabled(false);
-    ui->cloudpath->setPlainText(QString::fromStdString(clientname)+"-root\\");
+    ui->cloudpath->setPlainText("cloudpath");
     ui->localpath->setDisabled(true);
 
     ui->confirm->setDisabled(false);
@@ -60,7 +55,7 @@ void Dialog_folder::on_addpath_clicked()
 void Dialog_folder::on_deletepath_clicked()
 {
     ui->cloudpath->setDisabled(false);
-    ui->cloudpath->setPlainText(QString::fromStdString(clientname)+"-root\\");
+    ui->cloudpath->setPlainText("cloudpath");
     ui->localpath->setDisabled(true);
 
     ui->confirm->setDisabled(false);
@@ -70,18 +65,17 @@ void Dialog_folder::on_deletepath_clicked()
 void Dialog_folder::on_confirm_clicked()
 {
     if(status==BONDPATH){
-        bondDir("C:\\mycloud\\"+clientname+"\\usrconfig.conf",
-                ui->cloudpath->toPlainText().toStdString(),ui->localpath->toPlainText().toStdString());
+        bondDir("C:\\mycloud\\Liu\\usrconfig.conf",ui->cloudpath->toPlainText().toStdString(),ui->localpath->toPlainText().toStdString());
 
     }
     if(status==UNBONDPATH){
-        unbondDir("C:\\mycloud\\"+clientname+"\\usrconfig.conf", ui->cloudpath->toPlainText().toStdString());
+        unbondDir("C:\\mycloud\\Liu\\usrconfig.conf", ui->cloudpath->toPlainText().toStdString());
     }
     if(status==DELETEPATH){
-        deleteDir("C:\\mycloud\\"+clientname+"\\usrconfig.conf", ui->cloudpath->toPlainText().toStdString(), clientname);
+        deleteDir("C:\\mycloud\\Liu\\usrconfig.conf", ui->cloudpath->toPlainText().toStdString(), "Liu");
     }
     if(status==ADDPATH){
-        addDir("C:\\mycloud\\"+clientname+"\\usrconfig.conf", ui->cloudpath->toPlainText().toStdString(),clientname);
+        addDir("C:\\mycloud\\Liu\\usrconfig.conf", ui->cloudpath->toPlainText().toStdString(),"Liu");
     }
 
     ui->cloudpath->setDisabled(true);
@@ -91,17 +85,3 @@ void Dialog_folder::on_confirm_clicked()
 }
 
 
-
-void Dialog_folder::on_filearray_clicked()
-{
-    if(downloading_file!=""){
-        ui->textBrowser->clear();
-        QString show="当前正在下载：";
-        ui->textBrowser->setText(show+downloading_file.c_str());
-    }
-    else if(uploading_file!=""){
-        ui->textBrowser->clear();
-        QString show="当前正在上传：";
-        ui->textBrowser->setText(show+uploading_file.c_str());
-    }
-}

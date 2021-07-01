@@ -160,8 +160,8 @@ int Communication::send_configmessage(int op, string filename, string content, i
         }
     }
     netdisk_message msg(message_no, op, filename, 0, true, "", "", content, "", "", "", 0);
-    cout << "send" << endl;
-    cout << msg << endl;
+    // cout << "send" << endl;
+    // cout << msg << endl;
     string sendstr = message_to_string(msg);
     if (send(connfd, sendstr.c_str(), sendstr.length(), 0) <= 0)
     {
@@ -192,8 +192,8 @@ int Communication::send_usermessage(int op, string username, string userid, stri
     }
     netdisk_message msg(message_no, op, "", 0, 0, "", "", "", username, userid, passwd, user_correct);
     string sendstr = message_to_string(msg);
-    cout << "send" << endl;
-    cout << msg << endl;
+    //cout << "send" << endl;
+    //cout << msg << endl;
     if (send(connfd, sendstr.c_str(), sendstr.length(), 0) <= 0)
     {
         cout << "fail to send message, please check the network" << endl;
@@ -222,8 +222,8 @@ int Communication::send_message(int op, string filename, bool is_file, string pa
         }
     }
     netdisk_message msg(message_no, op, filename, is_file, is_tail, path, md5, content, "", "", "", 0);
-    cout << "send" << endl;
-    cout << msg << endl;
+    // cout << "send" << endl;
+    // cout << msg << endl;
     string sendstr = message_to_string(msg);
     if (send(connfd, sendstr.c_str(), sendstr.length(), 0) <= 0)
     {
@@ -240,7 +240,7 @@ int Communication::send_message(int op, string filename, bool is_file, string pa
 Communication::Communication(int fd) : connfd(fd)
 {
     this->ConnectError = false;
-    cout << "communication constructor" << endl;
+    // cout << "communication constructor" << endl;
     memset(message_count_use, 0, MAXMESSAGE);
 }
 
@@ -265,7 +265,7 @@ int Communication::recv_message(netdisk_message &recv_content)
     // recvstr = string(buf);
     // cout << recvstr << endl;
     recv_content = string_to_message(recvstr);
-    cout << recv_content << endl;
+    // cout << recv_content << endl;
     if (recv_content.op == FINISH || recv_content.op == EXIST)
     { // 如果通信结束，把消息号释放
         message_count_use[recv_content.no] = 0;
@@ -307,7 +307,7 @@ int Communication::state_next(netdisk_message msg)
     {
         this->STATE = INITIAL_CLIENT;
     }
-    cout << "state" << this->STATE << "msgop" << msg.op << endl;
+    // cout << "state" << this->STATE << "msgop" << msg.op << endl;
     if (this->STATE == REGIST)
     {
         int ret = procs_regist(msg);
@@ -357,18 +357,18 @@ int Communication::state_next(netdisk_message msg)
     }
     else if (this->STATE == INITIAL_CLIENT)
     {
-        cout << "flag" << endl;
+        // cout << "flag" << endl;
         if (msg.op == FINISH_INITIAL)
         {
-            cout << "flag_2" << endl;
+            // cout << "flag_2" << endl;
             this->STATE = INITIAL_SERVER;
             // 开始遍历云端文件
             userfiles(this->userid, this->rootpath, this->initialfiles, this->rootpath.length(), true);
             if (!this->initialfiles.empty())
             {
                 file temp = this->initialfiles.front();
-                cout << temp.path << endl;
-                cout << this->rootpath.length() << endl;
+                // cout << temp.path << endl;
+                // cout << this->rootpath.length() << endl;
                 send_message(INITIAL_SERVER, temp.filename, temp.is_file, &(temp.path[this->rootpath.length() + 1]), temp.md5, "");
             }
             else
@@ -383,7 +383,7 @@ int Communication::state_next(netdisk_message msg)
             if (msg.op == INITIAL_CLIENT)
             {
                 int re = sameNameFile(this->userid, msg.path, msg.md5) /* 检查文件是否存在 */;
-                cout << re << endl;
+                // cout << re << endl;
                 if (re == 0 || re == 2)
                 {
                     string filename = (re == 0 ? msg.filename : msg.filename + "-crash"); // 冲突
@@ -405,7 +405,7 @@ int Communication::state_next(netdisk_message msg)
                         else
                         {
                             send_message(EXIST, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
-                            cout << "create" << msg.path << endl;
+                            // cout << "create" << msg.path << endl;
                             createFile(this->userid, true, msg.path, "");
                             db.addLog(this->userid, "从客户端新增目录", msg.path);
                         }
@@ -433,8 +433,8 @@ int Communication::state_next(netdisk_message msg)
             {
                 temp = this->initialfiles.front();
                 // 询问是否要发
-                cout << temp.path << endl;
-                cout << this->rootpath.length() << endl;
+                // cout << temp.path << endl;
+                // cout << this->rootpath.length() << endl;
                 send_message(INITIAL_SERVER, temp.filename, temp.is_file, &(temp.path[this->rootpath.length() + 1]), temp.md5, "");
             }
             else
@@ -561,7 +561,7 @@ int Communication::procs_login(netdisk_message &msg)
 }
 int Communication::procs_regist(netdisk_message msg)
 {
-    cout << "calling function: procs_regist" << endl;
+    // cout << "calling function: procs_regist" << endl;
     if (db.accountUsed(msg.userid) == true)
     {
         cout << "账号重复" << endl;
@@ -576,7 +576,7 @@ int Communication::procs_regist(netdisk_message msg)
     string rootpath = ss.str();
     if (mkdir(rootpath.c_str(), 0755) == -1)
     {
-        cout << rootpath << endl;
+        // cout << rootpath << endl;
         cout << "生成用户目录失败" << endl;
         return myERROR;
     }
@@ -603,17 +603,17 @@ int Communication::sendfile(netdisk_message msg)
     stringstream ss;
     ss << this->rootpath << "/" << msg.path;
     string fullFileName = ss.str();
-    cout << "debug message: in sendfilefunction, fullFileName is " << fullFileName << endl;
+    // cout << "debug message: in sendfilefunction, fullFileName is " << fullFileName << endl;
     int orifd = open(fullFileName.c_str(), O_RDONLY);
-    char buffer[1024];
-    read(orifd, buffer, 1024);
+    char buffer[SENDFILESIZE];
+    read(orifd, buffer, SENDFILESIZE);
     close(orifd);
     buffer[32] = '\0';
     stringstream ss2;
     ss2 << FILEPOOL << buffer;
     string realFileName = ss2.str();
     int realfd = open(realFileName.c_str(), O_RDONLY);
-    int readret = read(realfd, buffer, 1024);
+    int readret = read(realfd, buffer, SENDFILESIZE);
     while (true)
     {
         string content;
@@ -621,7 +621,7 @@ int Communication::sendfile(netdisk_message msg)
         {
             content += buffer[i];
         }
-        if (readret == 1024)
+        if (readret == SENDFILESIZE)
         {
             send_message(SEND_FILE, msg.filename, true, msg.path, msg.md5, content, msg.no, false);
             if (recv_message(msgtemp) == myERROR)
@@ -640,7 +640,7 @@ int Communication::sendfile(netdisk_message msg)
             }
             break;
         }
-        readret = read(realfd, buffer, 1024);
+        readret = read(realfd, buffer, SENDFILESIZE);
     }
     close(realfd);
     return myOK;
@@ -648,12 +648,12 @@ int Communication::sendfile(netdisk_message msg)
 // 接收文件，返回已经接收的字节
 int Communication::recvfile(netdisk_message msg)
 {
-    cout << "receive" << endl;
+    // cout << "receive" << endl;
     // 写用户目录下的文件
     stringstream ss;
     ss << this->rootpath << "/" << msg.path;
     string fullFileName = ss.str();
-    cout << fullFileName << endl;
+    // cout << fullFileName << endl;
     ofstream outfile(fullFileName, ios::out);
     outfile << msg.md5;
     outfile.close();
@@ -662,15 +662,15 @@ int Communication::recvfile(netdisk_message msg)
     ss2 << FILEPOOL << msg.md5;
     string realFileName = ss2.str();
     ofstream realOutFile(realFileName, ios::out);
-    cout << realFileName << endl;
+    // cout << realFileName << endl;
     netdisk_message msgtemp;
     while (true)
     {
-        cout << "this" << endl;
+        // cout << "this" << endl;
         recv_message(msgtemp);
         send_message(FINISH, msg.filename, msg.is_file);
-        cout << "content: " << msgtemp.content << endl;
-        cout << "content length: " << msgtemp.content.length() << endl;
+        // cout << "content: " << msgtemp.content << endl;
+        // cout << "content length: " << msgtemp.content.length() << endl;
         realOutFile << msgtemp.content;
         if (msgtemp.is_tail)
             //if (msgtemp.content.length() != 1024)

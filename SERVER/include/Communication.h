@@ -48,8 +48,8 @@ using namespace std;
 #define op_begin 1
 #define flagtail_begin 2
 #define flagfile_begin 3
-#define SENDFILESIZE 1024 // 每次发送的文件大小
-#define SENDSIZE 2048
+#define SENDFILESIZE 10240 // 每次发送的文件大小
+#define SENDSIZE 20480
 #define usercorrect_begin 2 // 判断用户账号密码是否合法，包括注册、登录时都要用到
 #define MAXMESSAGE 128
 // 文件名，路径，md5码之间用\t作为分割，因为长度不定（呜呜

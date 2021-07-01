@@ -25,8 +25,7 @@ SOURCES += \
     dialog_regist.cpp \
     main.cpp \
     netdisk.cpp \
-    fileactions.cpp \
-    MD5.cpp
+    fileactions.cpp
 
 HEADERS += \
     communication.h \
@@ -34,8 +33,7 @@ HEADERS += \
     dialog_folder.h \
     dialog_regist.h \
     netdisk.h \
-    fileactions.h \
-    MD5.h
+    fileactions.h
 
 FORMS += \
     dialog_download.ui \
