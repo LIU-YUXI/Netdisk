@@ -75,7 +75,8 @@ int renameFile(int userId, string fileName, string newFileName)
     fullnewpath += newFileName;
     newFileName = fullnewpath;
     string fullFileName = getFullFileName(userId, fileName);
-    if (rename(fullFileName.c_str(), newFileName.c_str()) == 0)
+    cout << fullFileName << " " << getFullFileName(userId, newFileName) << endl;
+    if (rename(fullFileName.c_str(), getFullFileName(userId, newFileName).c_str()) == 0)
         return myOK;
     else
         return myERROR;

@@ -473,10 +473,7 @@ int Communication::state_next(netdisk_message msg)
             {
                 db.addLog(this->userid, "从客户端同步上传文件", msg.path);
                 send_message(NOT_GET, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
-                if (!msg.is_file)
-                {
-                    createFile(this->userid, true, msg.path, "");
-                }
+                createFile(this->userid, !msg.is_file, msg.path, msg.md5);
             }
         }
         else if (msg.op == CHANGE)
@@ -527,7 +524,7 @@ int Communication::state_next(netdisk_message msg)
             this->STATE = INITIAL_CLIENT;
             if (send_message(FINISH, msg.filename, 0, "", "", "", msg.no) == myERROR)
                 cout << "send error" << endl;
-            db.addLog(this->userid, "向客户端发送目录配置文件", msg.path);
+            db.addLog(this->userid, "从客户端接收目录配置文件", msg.path);
         }
     }
     return myOK;
