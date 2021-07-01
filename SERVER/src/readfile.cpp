@@ -17,9 +17,9 @@ int read(string filename, string &content)
         return myERROR;
 }
 // 递归调用
-int userfiles(int userid, string rootdir, queue<file> &files, bool is_root)
+int userfiles(int userid, string rootdir, queue<file> &files, int rootlength, bool is_root)
 {
-    if (!is_root && !db.directoryIsBind(userid, rootdir))
+    if (!is_root && !db.directoryIsBind(userid, &rootdir[rootlength + 1]))
         return myOK;
     DIR *dir;
     struct dirent *ptr;
@@ -38,12 +38,13 @@ int userfiles(int userid, string rootdir, queue<file> &files, bool is_root)
         if (ptr->d_type == DT_DIR)
         {
             files.push(ftmp);
-            userfiles(userid, ftmp.path, files);
+            userfiles(userid, ftmp.path, files, rootlength);
         }
         else
         {
+            /*
             FILE *fp = NULL;
-            string getmd5 = "md5sum " + ftmp.path;
+            string getmd5 = "md5sum \"" + ftmp.path + "\"";
             if ((fp = popen(getmd5.c_str(), "r")) != NULL)
             {
                 char md5res[33];
@@ -51,6 +52,11 @@ int userfiles(int userid, string rootdir, queue<file> &files, bool is_root)
                 ftmp.md5 = md5res;
                 pclose(fp);
             }
+            files.push(ftmp);
+            */
+            fstream in(ftmp.path, ios::in);
+            in >> ftmp.md5;
+            in.close();
             files.push(ftmp);
         }
     }

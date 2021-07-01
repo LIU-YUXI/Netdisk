@@ -363,7 +363,7 @@ int Communication::state_next(netdisk_message msg)
             cout << "flag_2" << endl;
             this->STATE = INITIAL_SERVER;
             // 开始遍历云端文件
-            userfiles(this->userid, this->rootpath, this->initialfiles, true);
+            userfiles(this->userid, this->rootpath, this->initialfiles, this->rootpath.length(), true);
             if (!this->initialfiles.empty())
             {
                 file temp = this->initialfiles.front();
@@ -400,12 +400,14 @@ int Communication::state_next(netdisk_message msg)
                         {
                             send_message(NOT_GET, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
                             createFile(this->userid, false, msg.path, msg.md5);
+                            db.addLog(this->userid, "从客户端同步上传文件", msg.path);
                         }
                         else
                         {
                             send_message(EXIST, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
                             cout << "create" << msg.path << endl;
                             createFile(this->userid, true, msg.path, "");
+                            db.addLog(this->userid, "从客户端新增目录", msg.path);
                         }
                     }
                 }
@@ -469,6 +471,7 @@ int Communication::state_next(netdisk_message msg)
             }
             else
             {
+                db.addLog(this->userid, "从客户端同步上传文件", msg.path);
                 send_message(NOT_GET, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
                 if (!msg.is_file)
                 {
@@ -490,22 +493,26 @@ int Communication::state_next(netdisk_message msg)
                 send_message(NOT_GET, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
             }
             updateFile(this->userid, msg.path, msg.md5);
+            db.addLog(this->userid, "从客户端同步更改文件", msg.path);
         }
         else if (msg.op == REMOVE)
         {
             deleteFile(userid, msg.path);
             db.decreaseFileLinks(msg.md5);
             send_message(FINISH, msg.filename, msg.is_file, "", "", "", msg.no);
+            db.addLog(this->userid, "从客户端同步删除文件", msg.path);
         }
         else if (msg.op == RENAME)
         {
             renameFile(userid, msg.path, msg.filename);
             send_message(FINISH, msg.filename, msg.is_file, "", "", "", msg.no);
+            db.addLog(this->userid, "从客户端同步重命名文件", msg.path + " -> " + msg.filename);
         }
         else if (msg.op == BIND_DIR)
         {
             db.addBindDirectory(this->userid, msg.path);
             send_message(FINISH, msg.filename, 0, msg.path, "", "", msg.no);
+            db.addLog(this->userid, "新增被客户端绑定的文件夹", msg.path);
         }
         else if (msg.op == RM_BIND_DIR)
         {
