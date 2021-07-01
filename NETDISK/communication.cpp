@@ -217,10 +217,12 @@ int Communication::recv_message(netdisk_message &recv_content)
     if(recv(sclient,buf,SENDSIZE,0)<=0)
         return myERROR;
     recvstr=string(buf);
+    qDebug()<<"before"<<endl;
     recv_content=string_to_message(recvstr);
     if(recv_content.op==FINISH){// 如果通信结束，把消息号释放
         message_count_use[recv_content.no]=0;
     }
+    qDebug()<<"after"<<endl;
     //print(recv_content);
     return myOK;
 }

@@ -45,7 +45,7 @@ void Dialog_regist::on_finish_clicked()
         ui->msg->setText("注册成功,3s后自动跳转");
     }
 
-    mysleep(3);
+    Sleep(3000);
     this->close();
 
 }

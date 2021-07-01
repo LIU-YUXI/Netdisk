@@ -29,7 +29,7 @@ void Dialog_folder::on_myfile_clicked()
 void Dialog_folder::on_link_clicked()
 {
     ui->cloudpath->setDisabled(false);
-    ui->cloudpath->setPlainText("cloudpath");
+    ui->cloudpath->setPlainText(QString::fromStdString(clientname)+"-root\\");
     ui->localpath->setDisabled(false);
     ui->localpath->setPlainText("localpath");
 
@@ -40,7 +40,7 @@ void Dialog_folder::on_link_clicked()
 void Dialog_folder::on_unlink_clicked()
 {
     ui->cloudpath->setDisabled(false);
-    ui->cloudpath->setPlainText("cloudpath");
+    ui->cloudpath->setPlainText(QString::fromStdString(clientname)+"-root\\");
     ui->localpath->setDisabled(true);
 
     ui->confirm->setDisabled(false);
@@ -50,7 +50,7 @@ void Dialog_folder::on_unlink_clicked()
 void Dialog_folder::on_addpath_clicked()
 {
     ui->cloudpath->setDisabled(false);
-    ui->cloudpath->setPlainText("cloudpath");
+    ui->cloudpath->setPlainText(QString::fromStdString(clientname)+"-root\\");
     ui->localpath->setDisabled(true);
 
     ui->confirm->setDisabled(false);
@@ -60,7 +60,7 @@ void Dialog_folder::on_addpath_clicked()
 void Dialog_folder::on_deletepath_clicked()
 {
     ui->cloudpath->setDisabled(false);
-    ui->cloudpath->setPlainText("cloudpath");
+    ui->cloudpath->setPlainText(QString::fromStdString(clientname)+"-root\\");
     ui->localpath->setDisabled(true);
 
     ui->confirm->setDisabled(false);

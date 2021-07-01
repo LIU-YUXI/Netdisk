@@ -132,6 +132,8 @@ void W2C(wchar_t* pwszSrc, int iSrcLen, char* pszDest, int iDestLen)
         NULL);
 }
 void checkFileschange(string dir,string path,boolean* run) {
+    if(dir.find("\r")!=dir.npos)
+        dir.erase(dir.find("\r"));
     HANDLE dir_handle = CreateFileA(dir.c_str(), FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 
     if (dir_handle == INVALID_HANDLE_VALUE) {
@@ -339,11 +341,12 @@ void startMonitor(string file) {
             string path=line.substr(line.find_first_of("\\")+1);
             path=path.erase(path.find(">"));
             openMonitorThread(line.substr(line.find(">") + 1),path+"\\");
+            threads[thread_pos]=true;
+            thread_pos++;
+            if(thread_pos==500)
+                thread_pos=0;
         }
-        threads[thread_pos]=true;
-        thread_pos++;
-        if(thread_pos==500)
-            thread_pos=0;
+
     }
 
     in.close();
@@ -723,25 +726,34 @@ boolean bondDir(string filename,string dir1,string dir2) {
         }
         string line = buff;
         if (line.find(dir1) != line.npos && cur_level == level) {
-            buff[i] = '>';
-            for (int j = i + 1; buff[j] != '\0'; j++)
-                buff[j] = '\0';
-            strcat(buff, dir2.c_str());
+            content.append(dir1);
+            content.append(">");
+            content.append(dir2);
+            content.append("\r\n");
+            continue;
         }
         content.append(buff);
         content.append("\n");
     }
+    qDebug()<<content.c_str()<<endl;
     file.close();
     file.open(filename.c_str(), ios::out | ios::trunc);
     //cout <<  content << endl;
     file << content;
     file.close();
     startMonitor(filename);
-    sendfile("usrconfig.conf","","",SENDCONFIG);
+    com.send_message(BIND_DIR,"",false,dir1.substr(dir1.find("\\")+1),"","");
+
     com.recv_message(msg);
     if(msg.op!=FINISH)
         return false;
+    sendfile("usrconfig.conf","","",SENDCONFIG,"C:\\mycloud\\"+clientname+"\\usrconfig.conf");
     writeLog(logfile,"Bond cloud path","success","Successfully bond "+dir2+" to "+dir1);
+    openFile(("C:\\mycloud\\"+clientname+"\\usrconfig.conf").c_str(),
+             ("C:\\mycloud\\"+clientname+"\\").length(),CHECKMD5);
+    com.send_message(FINISH_INITIAL,"",false,"","","");
+
+    receiveFiles();
     return true;
 }
 boolean deleteDir(string filename, string dirname,string clientusrname) {//可以优化 是否删除目录下的全部文件
@@ -940,14 +952,6 @@ string makesureConfigexist() {
 
     }//进行目录绑定
     return "";
-}
-
-void mysleep(int period){
-    QTime t;
-    t.start();
-    while(t.elapsed()<period*1000){
-        QCoreApplication::processEvents();
-    }
 }
 
 string retLocalpath(string path,string filename){
