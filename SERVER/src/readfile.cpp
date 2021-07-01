@@ -67,3 +67,15 @@ int writefile(string filename, string content)
     outfile.close();
     return myOK;
 }
+
+int renewfile(string filename, string content)
+{
+    remove(filename.c_str());
+    ofstream outfile(filename, ios::out);
+    if (!outfile.is_open())
+        return myERROR;
+    cout << "renewfile: " << filename << endl;
+    outfile << content;
+    outfile.close();
+    return myOK;
+}

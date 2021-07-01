@@ -192,6 +192,8 @@ int Communication::send_usermessage(int op, string username, string userid, stri
     }
     netdisk_message msg(message_no, op, "", 0, 0, "", "", "", username, userid, passwd, user_correct);
     string sendstr = message_to_string(msg);
+    cout << "send" << endl;
+    cout << msg << endl;
     if (send(connfd, sendstr.c_str(), sendstr.length(), 0) <= 0)
     {
         cout << "fail to send message, please check the network" << endl;
@@ -258,7 +260,9 @@ int Communication::recv_message(netdisk_message &recv_content)
         return myERROR;
     }
     buf[length] = 0;
-    recvstr = string(buf);
+    for (int i = 0; i < length; ++i)
+        recvstr += buf[i];
+    // recvstr = string(buf);
     // cout << recvstr << endl;
     recv_content = string_to_message(recvstr);
     cout << recv_content << endl;
@@ -298,6 +302,11 @@ int Communication::state_next(netdisk_message msg)
     {
         this->STATE = LOGIN;
     }
+
+    if (msg.op == INITIAL_CLIENT)
+    {
+        this->STATE = INITIAL_CLIENT;
+    }
     cout << "state" << this->STATE << "msgop" << msg.op << endl;
     if (this->STATE == REGIST)
     {
@@ -326,10 +335,6 @@ int Communication::state_next(netdisk_message msg)
             {
                 this->STATE = SENDCONFIG;
             }
-        }
-        else
-        {
-            send_usermessage(LOGIN, msg.username, msg.userid, msg.passwd, false, msg.no);
         }
     }
     else if (this->STATE == GETCONFIG)
@@ -362,8 +367,9 @@ int Communication::state_next(netdisk_message msg)
             if (!this->initialfiles.empty())
             {
                 file temp = this->initialfiles.front();
-                // 询问是否要发
-                send_message(INITIAL_SERVER, temp.filename, temp.is_file, temp.path, temp.md5, "");
+                cout << temp.path << endl;
+                cout << this->rootpath.length() << endl;
+                send_message(INITIAL_SERVER, temp.filename, temp.is_file, &(temp.path[this->rootpath.length() + 1]), temp.md5, "");
             }
             else
             {
@@ -415,23 +421,25 @@ int Communication::state_next(netdisk_message msg)
     {
         if (!this->initialfiles.empty())
         {
+            file temp = this->initialfiles.front();
             if (msg.op == SURE_GET)
             {
-                file temp = this->initialfiles.front();
                 sendfile(msg);
-                this->initialfiles.pop();
-                if (!this->initialfiles.empty())
-                {
-                    temp = this->initialfiles.front();
-                    // 询问是否要发
-                    send_message(INITIAL_SERVER, temp.filename, temp.is_file, &(temp.path[this->rootpath.length() - 1]), temp.md5, "");
-                }
-                else
-                {
-                    send_message(FINISH_INITIAL, "", false);
-                    this->STATE = PROCSEXCP;
-                    state_next(msg);
-                }
+            }
+            this->initialfiles.pop();
+            if (!this->initialfiles.empty())
+            {
+                temp = this->initialfiles.front();
+                // 询问是否要发
+                cout << temp.path << endl;
+                cout << this->rootpath.length() << endl;
+                send_message(INITIAL_SERVER, temp.filename, temp.is_file, &(temp.path[this->rootpath.length() + 1]), temp.md5, "");
+            }
+            else
+            {
+                send_message(FINISH_INITIAL, "", false);
+                this->STATE = PROCSEXCP;
+                state_next(msg);
             }
         }
     }
@@ -448,7 +456,7 @@ int Communication::state_next(netdisk_message msg)
             // 分裂线程开始接收
             recvfile(msg);
         }
-        else if (msg.op == SEND || msg.op == CHANGE)
+        else if (msg.op == SEND)
         {
             int re = sameNameFile(this->userid, msg.filename, msg.md5);           /* 检查文件是否存在 */
             string filename = (re == 0 ? msg.filename : msg.filename + "-crash"); // 冲突
@@ -467,6 +475,21 @@ int Communication::state_next(netdisk_message msg)
                     createFile(this->userid, true, msg.path, "");
                 }
             }
+        }
+        else if (msg.op == CHANGE)
+        {
+            if (msg.is_file && db.fileExists(msg.md5) == 0)
+            { /* 检查文件池里有没有这个文件 */
+                send_message(SURE_GET, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
+                db.addFile(msg.md5);
+                // 分裂线程开始接收
+                recvfile(msg);
+            }
+            else
+            {
+                send_message(NOT_GET, msg.filename, msg.is_file, msg.path, msg.md5, msg.content, msg.no, msg.is_tail);
+            }
+            updateFile(this->userid, msg.path, msg.md5);
         }
         else if (msg.op == REMOVE)
         {
@@ -491,6 +514,11 @@ int Communication::state_next(netdisk_message msg)
         }
         else if (msg.op == SENDCONFIG)
         {
+            cout << "成功接收到初始配置文件" << endl; // 收到客户端发来的初始化
+            renewfile(this->configname, msg.content);
+            this->STATE = INITIAL_CLIENT;
+            if (send_message(FINISH, msg.filename, 0, "", "", "", msg.no) == myERROR)
+                cout << "send error" << endl;
         }
     }
     return myOK;
@@ -521,7 +549,7 @@ int Communication::procs_login(netdisk_message &msg)
     stringstream sss;
     sss << USERFILEDIR << dbuserid;
     this->rootpath = sss.str();
-    if (send_usermessage(FINISH, msg.username, msg.userid, msg.passwd, true, msg.no) < 0)
+    if (send_usermessage(LOGIN, msg.username, msg.userid, msg.passwd, true, msg.no) < 0)
         return myERROR;
     return myOK;
 }
