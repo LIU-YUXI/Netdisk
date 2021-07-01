@@ -577,13 +577,16 @@ void open_folder(const char para[], int round, int ctrl[],string content,int len
         qDebug()<<islinked<<endl;
         if (islinked) {
             //qDebug()<<QString::fromStdString(a)<<endl;
+
             memset(adr, 0, 260);
-            a.erase(a.length() - 1);
+            a.erase(std::remove(a.begin(), a.end(), '\r'), a.end());
+            a.erase(std::remove(a.begin(), a.end(), '\n'), a.end());
             strcat(adr,a.c_str());
             strcat(adr, "\\*.*");
         }
         //qDebug()<<"adr"<<adr<<endl;
-        open_folder(adr, round + 1, ctrl,content,length,opt,tempstr+="\\");
+        if(strcmp(adr,para))
+            open_folder(adr, round + 1, ctrl,content,length,opt,tempstr+="\\");
         if (!done)
         {
             FindClose(hfFind);
@@ -966,13 +969,15 @@ string retLocalpath(string path,string filename){
         if(line.find(">")!=line.npos){
             string withoutroot=line.substr(line.find_first_of("\\")+1);
             withoutroot.erase(withoutroot.find(">"));
-            if(path.find(withoutroot)!=path.npos){
+            if(path.find(withoutroot)!=path.npos&&path!=withoutroot){
                 string ret;
                 ret=line.substr((line.find(">")+1));
                 ret+="\\";
+                for(int i=0;i<(int)path.length();i++)
+                    if(path[i]=='/')
+                        path[i]='\\';
                 ret+=path.substr(path.find("\\")+1);
-                ret+="\\";
-                ret+=filename;
+                ret.erase(std::remove(ret.begin(), ret.end(), '\r'), ret.end());
                 in.close();
                 return ret;
             }
@@ -990,6 +995,7 @@ void receiveFiles(){
         }
         if(msg.is_file){
             WIN32_FIND_DATAA fdfile;
+            qDebug()<<path.c_str()<<endl;
             if(FindFirstFileA(path.c_str(), &fdfile)==INVALID_HANDLE_VALUE){//不存在
                 ofstream out;
                 out.open(path.c_str(),ios::out);

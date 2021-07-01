@@ -96,8 +96,8 @@ void netdisk::on_login_clicked()
     }
     this->close();
 
-    RemoveDirectoryA(("C:\\mycloud\\"+clientname).c_str());
-    createFoldersbyFile("C:\\mycloud\\"+clientname+"\\usrconfig.conf","C:\\mycloud\\"+clientname);
+    //RemoveDirectoryA(("C:\\mycloud\\"+clientname).c_str());
+    //createFoldersbyFile("C:\\mycloud\\"+clientname+"\\usrconfig.conf","C:\\mycloud\\"+clientname);
     openFile(("C:\\mycloud\\"+clientname+"\\usrconfig.conf").c_str(),
              ("C:\\mycloud\\"+clientname+"\\").length(),CHECKMD5);
     com.send_message(FINISH_INITIAL,"",false,"","","");

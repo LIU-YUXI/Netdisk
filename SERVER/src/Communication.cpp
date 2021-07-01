@@ -518,6 +518,7 @@ int Communication::state_next(netdisk_message msg)
         {
             db.deleteBindDirectory(this->userid, msg.path);
             send_message(FINISH, msg.filename, 0, msg.path, "", "", msg.no);
+            db.addLog(this->userid, "解除被客户端绑定的文件夹", msg.path);
         }
         else if (msg.op == SENDCONFIG)
         {
@@ -526,6 +527,7 @@ int Communication::state_next(netdisk_message msg)
             this->STATE = INITIAL_CLIENT;
             if (send_message(FINISH, msg.filename, 0, "", "", "", msg.no) == myERROR)
                 cout << "send error" << endl;
+            db.addLog(this->userid, "向客户端发送目录配置文件", msg.path);
         }
     }
     return myOK;
