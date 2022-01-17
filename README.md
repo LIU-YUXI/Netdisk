@@ -24,7 +24,7 @@ Qt5.14.2
 
 MySQL8
 
-### 技术点
+### 技术点 function
 
 - TCP socket
 - epoll
