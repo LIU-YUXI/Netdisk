@@ -1,12 +1,10 @@
-# 网络同步盘
-# Network sync disk
+# 网络同步盘 Network sync disk
 刘羽茜 刘云帆 钟伊凡
 Yuxi Liu，Yunfan Liu，Ivan Zhong
 
 
 
-## 项目背景
-# Background
+## 项目背景 Background
 A cloud disk that allows binding folders to be synchronized locally and in the cloud or between two different machines
 
 
